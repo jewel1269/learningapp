@@ -5,6 +5,7 @@ import { AppError } from '../../common/errors/AppError';
 import { getAiClient } from '../ai-guidance/ai.client';
 import { QUIZ_SYSTEM_PROMPT, buildQuizPrompt } from '../ai-guidance/prompts';
 import { resolveOwnedLesson } from '../lessons/lesson.service';
+import { safeAward } from '../gamification/gamification.service';
 import {
   GeneratedAssessmentSchema,
   type GeneratedAssessment,
@@ -75,5 +76,7 @@ export async function submitQuiz(
     answers,
     judge,
   );
-  return QuizSubmission.create({ quizId: quiz._id, userId, answers, results, score });
+  const submission = await QuizSubmission.create({ quizId: quiz._id, userId, answers, results, score });
+  await safeAward(userId, { assessmentScore: score }); // §3 assessment achievements
+  return submission;
 }

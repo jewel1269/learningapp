@@ -46,7 +46,14 @@ app.use(
 
 app.use(helmet());
 app.use(cors({ origin: env.corsOrigin, credentials: true }));
-app.use(express.json({ limit: '1mb' }));
+
+// The Stripe webhook needs the raw body for signature verification, so it must
+// bypass the JSON parser (its route mounts express.raw itself).
+const jsonParser = express.json({ limit: '1mb' });
+app.use((req, res, next) => {
+  if (req.path === '/subscriptions/webhook') return next();
+  return jsonParser(req, res, next);
+});
 
 // Liveness — the process is up (no external dependencies).
 app.get('/health', (_req, res) => {

@@ -1,5 +1,10 @@
-import type { Request, Response, NextFunction } from 'express';
+import { asyncHandler } from '../../common/utils/asyncHandler';
+import * as service from './gamification.service';
 
-// TODO: implement controller handlers
+export const getAchievements = asyncHandler(async (_req, res) => {
+  res.json({ achievements: await service.listAchievements() });
+});
 
-export {};
+export const getMe = asyncHandler(async (req, res) => {
+  res.json(await service.getMyAchievements(req.user!.id));
+});

@@ -3,6 +3,7 @@ import { Lesson } from './lesson.model';
 import { Course } from '../courses/course.model';
 import { User } from '../users/user.model';
 import { UserLessonProgress } from '../progress/progress.model';
+import { safeAward } from '../gamification/gamification.service';
 import { AppError } from '../../common/errors/AppError';
 
 // Pure daily-streak transition (calendar-day based, UTC). Exported for tests.
@@ -79,5 +80,17 @@ export async function completeLesson(userId: string, lessonId: string, now: Date
   if (progressPercent >= 100 && course.status === 'ready') course.status = 'completed';
   await course.save();
 
-  return { progress, streak, course: { progressPercent, status: course.status } };
+  // Gamification (§3): award lesson / streak / course-completion achievements.
+  // Non-fatal — a gamification failure must never break lesson completion.
+  const totalCompleted = await UserLessonProgress.countDocuments({
+    userId,
+    status: 'completed',
+  });
+  const achievements = await safeAward(userId, {
+    lessonsCompleted: totalCompleted,
+    streak: streak?.current,
+    courseCompleted: progressPercent >= 100,
+  });
+
+  return { progress, streak, course: { progressPercent, status: course.status }, achievements };
 }

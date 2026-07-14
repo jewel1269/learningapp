@@ -7,7 +7,7 @@ import { AppError } from '../../common/errors/AppError';
 import { getAiClient } from '../ai-guidance/ai.client';
 import { EXERCISE_SYSTEM_PROMPT, buildExercisePrompt } from '../ai-guidance/prompts';
 import { resolveOwnedLesson } from '../lessons/lesson.service';
-import { gradingQueue } from '../../jobs/queue';
+import { gradingQueue, jobPriority } from '../../jobs/queue';
 
 export const GeneratedExerciseSchema = z.object({
   description: z.string().min(1),
@@ -93,7 +93,13 @@ export async function getSubmission(userId: string, submissionId: string) {
 }
 
 // Records the submission (status: submitted) and enqueues async grading (§8).
-export async function submitExercise(userId: string, exerciseId: string, submissionData: unknown) {
+// Premium submissions are graded at a higher queue priority (§6).
+export async function submitExercise(
+  userId: string,
+  exerciseId: string,
+  submissionData: unknown,
+  tier = 'free',
+) {
   const exercise = await getExercise(userId, exerciseId); // ownership
   const submission = await ExerciseSubmission.create({
     exerciseId: exercise._id,
@@ -101,6 +107,10 @@ export async function submitExercise(userId: string, exerciseId: string, submiss
     submissionData,
     status: 'submitted',
   });
-  await gradingQueue().add('grade', { submissionId: String(submission._id) });
+  await gradingQueue().add(
+    'grade',
+    { submissionId: String(submission._id) },
+    { priority: jobPriority(tier) },
+  );
   return submission;
 }

@@ -23,11 +23,18 @@ const envSchema = z
       .default('docker-local'),
     SANDBOX_EXECUTION_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
     SANDBOX_MAX_MEMORY_MB: z.coerce.number().int().positive().default(256),
+    SANDBOX_CPUS: z.coerce.number().positive().default(0.5),
+    SANDBOX_PIDS_LIMIT: z.coerce.number().int().positive().default(64),
+    SANDBOX_MAX_OUTPUT_BYTES: z.coerce.number().int().positive().default(65_536),
+    LAB_CODE_MAX_BYTES: z.coerce.number().int().positive().default(65_536),
 
     EMAIL_PROVIDER_API_KEY: z.string().default(''),
 
     STRIPE_SECRET_KEY: z.string().default(''),
     STRIPE_WEBHOOK_SECRET: z.string().default(''),
+    STRIPE_PRICE_ID: z.string().default(''),
+    STRIPE_SUCCESS_URL: z.string().default('http://localhost:3000/billing/success'),
+    STRIPE_CANCEL_URL: z.string().default('http://localhost:3000/billing/cancel'),
   })
   // Secrets that are optional in dev/test but MUST be present in production.
   .superRefine((val, ctx) => {
@@ -71,7 +78,14 @@ export const env = {
   sandboxProvider: data.SANDBOX_EXECUTION_PROVIDER,
   sandboxTimeoutMs: data.SANDBOX_EXECUTION_TIMEOUT_MS,
   sandboxMaxMemoryMb: data.SANDBOX_MAX_MEMORY_MB,
+  sandboxCpus: data.SANDBOX_CPUS,
+  sandboxPidsLimit: data.SANDBOX_PIDS_LIMIT,
+  sandboxMaxOutputBytes: data.SANDBOX_MAX_OUTPUT_BYTES,
+  labCodeMaxBytes: data.LAB_CODE_MAX_BYTES,
   emailProviderApiKey: data.EMAIL_PROVIDER_API_KEY,
   stripeSecretKey: data.STRIPE_SECRET_KEY,
   stripeWebhookSecret: data.STRIPE_WEBHOOK_SECRET,
+  stripePriceId: data.STRIPE_PRICE_ID,
+  stripeSuccessUrl: data.STRIPE_SUCCESS_URL,
+  stripeCancelUrl: data.STRIPE_CANCEL_URL,
 } as const;

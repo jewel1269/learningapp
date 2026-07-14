@@ -6,6 +6,7 @@ import { Course } from '../courses/course.model';
 import { AppError } from '../../common/errors/AppError';
 import { getAiClient } from '../ai-guidance/ai.client';
 import { EXAM_SYSTEM_PROMPT, buildExamPrompt } from '../ai-guidance/prompts';
+import { safeAward } from '../gamification/gamification.service';
 import {
   GeneratedAssessmentSchema,
   type GeneratedAssessment,
@@ -104,5 +105,7 @@ export async function submitExam(
     answers,
     judge,
   );
-  return ExamSubmission.create({ examId: exam._id, userId, answers, results, score });
+  const submission = await ExamSubmission.create({ examId: exam._id, userId, answers, results, score });
+  await safeAward(userId, { assessmentScore: score }); // §3 assessment achievements
+  return submission;
 }

@@ -25,6 +25,7 @@ export const submitExercise = asyncHandler(async (req, res) => {
     req.user!.id,
     req.params.id,
     req.body.submissionData,
+    req.user!.tier,
   );
   res.status(202).json({ submission }); // 202 — grading runs asynchronously
 });

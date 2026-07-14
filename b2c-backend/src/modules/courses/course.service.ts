@@ -5,7 +5,7 @@ import { Lesson } from '../lessons/lesson.model';
 import { User } from '../users/user.model';
 import { AppError } from '../../common/errors/AppError';
 import { logger } from '../../common/utils/logger';
-import { courseGenerationQueue } from '../../jobs/queue';
+import { courseGenerationQueue, jobPriority } from '../../jobs/queue';
 import { generateCourseTree, type CourseTreeGenerator } from './course.generator';
 
 export interface CreateCourseInput {
@@ -46,7 +46,11 @@ export async function createCourse(userId: string, input: CreateCourseInput) {
     progressPercent: 0,
   });
 
-  await courseGenerationQueue().add('generate', { courseId: String(course._id) });
+  await courseGenerationQueue().add(
+    'generate',
+    { courseId: String(course._id) },
+    { priority: jobPriority(user.tier as string) },
+  );
   return course;
 }
 

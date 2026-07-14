@@ -12,4 +12,14 @@ const notificationSchema = new Schema(
   { timestamps: true },
 );
 
+notificationSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc, ret: Record<string, unknown>) => {
+    ret.id = ret._id;
+    delete ret._id;
+    return ret;
+  },
+});
+
 export const Notification = model('Notification', notificationSchema);

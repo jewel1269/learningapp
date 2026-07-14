@@ -1,5 +1,14 @@
-import type { Request, Response, NextFunction } from 'express';
+import { asyncHandler } from '../../../common/utils/asyncHandler';
+import * as service from './network.service';
 
-// TODO: implement controller handlers
+export const list = asyncHandler(async (_req, res) => {
+  res.json({ scenarios: service.listScenarios() });
+});
 
-export {};
+export const getOne = asyncHandler(async (req, res) => {
+  res.json({ scenario: service.getScenario(req.params.id) });
+});
+
+export const submit = asyncHandler(async (req, res) => {
+  res.json({ result: service.submitScenario(req.params.id, req.body.answers) });
+});

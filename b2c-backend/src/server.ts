@@ -9,16 +9,32 @@ import {
   stopCourseGenerationWorker,
 } from './jobs/courseGenerationWorker';
 import { startGradingWorker, stopGradingWorker } from './jobs/gradingWorker';
+import {
+  startStreakResetWorker,
+  stopStreakResetWorker,
+  scheduleStreakReset,
+} from './jobs/streakResetWorker';
+import {
+  startDailyReminderWorker,
+  stopDailyReminderWorker,
+  scheduleDailyReminders,
+} from './jobs/dailyReminderWorker';
+import { seedAchievements } from './modules/gamification/gamification.service';
 import { logger } from './common/utils/logger';
 
 async function bootstrap(): Promise<void> {
   await connectDB();
   await ensureIndexes();
+  await seedAchievements();
   await redis.connect();
   logger.info('Redis connected');
 
   startCourseGenerationWorker();
   startGradingWorker();
+  startStreakResetWorker();
+  await scheduleStreakReset();
+  startDailyReminderWorker();
+  await scheduleDailyReminders();
 
   const server = createServer(app);
   server.listen(env.port, () => logger.info(`b2c-backend listening on :${env.port}`));
@@ -33,6 +49,12 @@ async function bootstrap(): Promise<void> {
       logger.error({ err }, 'Error stopping course worker'),
     );
     await stopGradingWorker().catch((err) => logger.error({ err }, 'Error stopping grading worker'));
+    await stopStreakResetWorker().catch((err) =>
+      logger.error({ err }, 'Error stopping streak-reset worker'),
+    );
+    await stopDailyReminderWorker().catch((err) =>
+      logger.error({ err }, 'Error stopping daily-reminder worker'),
+    );
     await closeQueues().catch((err) => logger.error({ err }, 'Error closing queues'));
     await disconnectDB().catch((err) => logger.error({ err }, 'Error disconnecting Mongo'));
     redis.disconnect();

@@ -84,6 +84,21 @@ export async function consumeQuota(
   return { limit, used };
 }
 
+// Releases one previously-consumed unit (never below zero). Used when a charged
+// operation could not actually run — e.g. a sandbox that failed to launch.
+export async function refundQuota(
+  userId: string,
+  kind: QuotaKind,
+  now: Date = new Date(),
+): Promise<void> {
+  const periodStart = utcDay(now);
+  const countKey = KIND_TO_COUNT[kind];
+  await UsageQuota.updateOne(
+    { userId, period: 'daily', periodStart, [`counts.${countKey}`]: { $gt: 0 } },
+    { $inc: { [`counts.${countKey}`]: -1 } },
+  );
+}
+
 // Current-day usage snapshot for a user (for the admin cost view / a usage endpoint).
 export async function getQuota(userId: string, tier: string, now: Date = new Date()) {
   const periodStart = utcDay(now);

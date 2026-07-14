@@ -1,7 +1,19 @@
 import { Router } from 'express';
+import { z } from 'zod';
+import { authenticate } from '../../../middlewares/auth.middleware';
+import { validate } from '../../../middlewares/validate.middleware';
+import * as controller from './network.controller';
+
+const submitSchema = z.object({
+  answers: z.array(z.object({ questionId: z.string().min(1), answer: z.string() })).min(1),
+});
 
 const router = Router();
 
-// TODO: define network-simulator routes
+router.use(authenticate);
+
+router.get('/scenarios', controller.list);
+router.get('/scenario/:id', controller.getOne);
+router.post('/scenario/:id/submit', validate({ body: submitSchema }), controller.submit);
 
 export default router;
