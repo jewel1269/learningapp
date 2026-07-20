@@ -9,5 +9,10 @@ export interface User {
   preferences: {
     visualsPreferred: boolean;
     dailyNotification: boolean;
+    timezone?: string;
+  };
+  streak?: {
+    current: number;
+    lastActivityDate?: string | null;
   };
 }

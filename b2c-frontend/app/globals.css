@@ -1,85 +1,143 @@
 @import "tailwindcss";
 
-/* Class-based dark mode: theme flips when a `.dark` ancestor is present. */
+/* Class-based dark mode */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ============ Design tokens (light) ============ */
+/* ============ Design tokens — LMS Admin (light) ============ */
 :root {
-  --bg: #ffffff;
-  --bg-soft: #fbfaff;
-  --bg-lav: #f4f1fe;
-  --bg-elev: #ffffff;
+  --bg: #F8FAFC;
+  --bg-soft: #F1F5F9;
+  --bg-lav: #E2E8F0;
+  --bg-elev: #FFFFFF;
 
-  --ink: #16162a;
-  --ink-2: #5a5a72;
-  --ink-3: #8b8ba1;
+  --ink: #0F172A;
+  --ink-2: #64748B;
+  --ink-3: #94A3B8;
 
-  --line: #eceaf6;
-  --line-2: #e3e0f2;
+  --line: #E2E8F0;
+  --line-2: #CBD5E1;
 
-  --primary: #6c5ce7;
-  --primary-2: #9b8cfb;
-  --primary-soft: #eee9ff;
-  --primary-ink: #ffffff;
+  /* Brand primary — Indigo */
+  --primary: #4F46E5;
+  --primary-2: #6366F1;
+  --primary-soft: #EEF2FF;
+  --primary-ink: #FFFFFF;
 
-  --good: #2cb673;
-  --good-soft: #e4f6ec;
-  --bad: #f0596b;
-  --bad-soft: #fdeaec;
-  --warn: #f3a73b;
-  --warn-soft: #fdf0dd;
+  /* Secondary — Violet */
+  --secondary: #7C3AED;
+  --secondary-soft: #F3E8FF;
+  --secondary-ink: #FFFFFF;
 
-  --tint-blue: #e9effc;
-  --tint-mint: #e4f6ec;
-  --tint-peach: #fcede4;
-  --tint-pink: #fce7f1;
-  --tint-lime: #eff5da;
-  --tint-lav: #eee9fe;
+  /* Accent — Cyan */
+  --accent: #06B6D4;
+  --accent-soft: #ECFEFF;
+  --accent-ink: #FFFFFF;
 
-  --shadow-soft: 0 2px 8px rgba(20, 16, 60, 0.05);
-  --shadow-card: 0 10px 30px -12px rgba(60, 44, 140, 0.18);
-  --shadow-lift: 0 30px 70px -30px rgba(60, 44, 140, 0.35);
+  --good: #22C55E;
+  --good-soft: #F0FDF4;
+  --bad: #EF4444;
+  --bad-soft: #FEF2F2;
+  --warn: #F59E0B;
+  --warn-soft: #FFFBEB;
+
+  --tint-blue: #EFF6FF;
+  --tint-mint: #ECFDF5;
+  --tint-peach: #FFF7ED;
+  --tint-pink: #FDF2F8;
+  --tint-lime: #F7FEE7;
+  --tint-lav: #F5F3FF;
+
+  /* KPI Card Gradients */
+  --kpi-primary-from: #4F46E5;
+  --kpi-primary-to: #7C3AED;
+  --kpi-secondary-from: #7C3AED;
+  --kpi-secondary-to: #A855F7;
+  --kpi-accent-from: #06B6D4;
+  --kpi-accent-to: #22D3EE;
+  --kpi-good-from: #22C55E;
+  --kpi-good-to: #4ADE80;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-soft: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-card: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lift: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-elevated: 0 20px 40px -12px rgba(15, 23, 42, 0.12);
+  --shadow-glass: 0 8px 32px rgba(79, 70, 229, 0.08);
+
+  /* Sidebar */
+  --sidebar-bg: #FFFFFF;
+  --sidebar-border: #F1F5F9;
+  --sidebar-hover: #F8F9FB;
+  --sidebar-active: rgba(79, 70, 229, 0.08);
+  --sidebar-width: 270px;
+  --sidebar-collapsed-width: 72px;
 }
 
-/* ============ Design tokens (dark) ============ */
+/* ============ Design tokens — LMS Admin (dark) ============ */
 .dark {
-  --bg: #131222;
-  --bg-soft: #171528;
-  --bg-lav: #1c1935;
-  --bg-elev: #1a1830;
+  --bg: #0B1120;
+  --bg-soft: #111827;
+  --bg-lav: #1E293B;
+  --bg-elev: #1E293B;
 
-  --ink: #f1effb;
-  --ink-2: #aba8c4;
-  --ink-3: #7b7896;
+  --ink: #F1F5F9;
+  --ink-2: #94A3B8;
+  --ink-3: #64748B;
 
-  --line: #2a2742;
-  --line-2: #322e4e;
+  --line: #1E293B;
+  --line-2: #334155;
 
-  --primary: #9184fb;
-  --primary-2: #b4a8ff;
-  --primary-soft: #241f3e;
-  --primary-ink: #131222;
+  --primary: #818CF8;
+  --primary-2: #A5B4FC;
+  --primary-soft: #1E1B4B;
+  --primary-ink: #FFFFFF;
 
-  --good: #37d08a;
-  --good-soft: #16301f;
-  --bad: #ff6b7c;
-  --bad-soft: #331a20;
-  --warn: #f5b653;
-  --warn-soft: #33260f;
+  --secondary: #A78BFA;
+  --secondary-soft: #2E1065;
+  --secondary-ink: #FFFFFF;
 
-  --tint-blue: #1b2540;
-  --tint-mint: #16301f;
-  --tint-peach: #33221a;
-  --tint-pink: #331e2a;
-  --tint-lime: #2a2e17;
-  --tint-lav: #241f3e;
+  --accent: #22D3EE;
+  --accent-soft: #083344;
+  --accent-ink: #0F172A;
 
-  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.35);
-  --shadow-card: 0 14px 34px -14px rgba(0, 0, 0, 0.6);
-  --shadow-lift: 0 34px 80px -30px rgba(0, 0, 0, 0.75);
+  --good: #4ADE80;
+  --good-soft: #052E16;
+  --bad: #F87171;
+  --bad-soft: #450A0A;
+  --warn: #FBBF24;
+  --warn-soft: #422006;
+
+  --tint-blue: #0C1929;
+  --tint-mint: #052E1A;
+  --tint-peach: #2A1508;
+  --tint-pink: #2A0E1E;
+  --tint-lime: #1A2608;
+  --tint-lav: #1E1538;
+
+  --kpi-primary-from: #4F46E5;
+  --kpi-primary-to: #6D28D9;
+  --kpi-secondary-from: #7C3AED;
+  --kpi-secondary-to: #9333EA;
+  --kpi-accent-from: #0891B2;
+  --kpi-accent-to: #06B6D4;
+  --kpi-good-from: #16A34A;
+  --kpi-good-to: #22C55E;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lift: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 20px 40px -12px rgba(0, 0, 0, 0.6);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+  --sidebar-bg: #111827;
+  --sidebar-border: #1E293B;
+  --sidebar-hover: #1E293B;
+  --sidebar-active: #1E1B4B;
 }
 
-/* ============ Map tokens to Tailwind utilities (bg-primary, text-ink, …) ============ */
+/* ============ Map tokens to Tailwind ============ */
 @theme inline {
   --color-bg: var(--bg);
   --color-bg-soft: var(--bg-soft);
@@ -94,6 +152,12 @@
   --color-primary-2: var(--primary-2);
   --color-primary-soft: var(--primary-soft);
   --color-primary-ink: var(--primary-ink);
+  --color-secondary: var(--secondary);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-secondary-ink: var(--secondary-ink);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
   --color-good: var(--good);
   --color-good-soft: var(--good-soft);
   --color-bad: var(--bad);
@@ -107,33 +171,172 @@
   --color-tint-lime: var(--tint-lime);
   --color-tint-lav: var(--tint-lav);
 
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-inter), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
+/* ============ Base Styles ============ */
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.025em;
+}
+
 ::selection {
   background: var(--primary);
   color: #ffffff;
 }
 
-/* ─── Navbar underline hover animation ─── */
-.nav-underline {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 2px;
-  background: #0D6E63;
-  border-radius: 999px;
-  transition: width 250ms ease;
+/* ============ Scrollbar Styling ============ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-.nav-link:hover .nav-underline {
-  width: 100%;
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-3);
+}
+
+/* ============ Animations ============ */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes counter-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out both;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out both;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out both;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Stagger children animations */
+.stagger-children > * {
+  animation: fade-in 0.4s ease-out both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 420ms; }
+
+/* ============ Glassmorphism Utility ============ */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass {
+  background: rgba(30, 41, 59, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ============ Card Hover Effects ============ */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+/* ============ Gradient Text ============ */
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============ Sidebar Transitions ============ */
+.sidebar-transition {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============ Focus Ring ============ */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ============ KPI Card Gradient Backgrounds ============ */
+.kpi-gradient-1 {
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+}
+.kpi-gradient-2 {
+  background: linear-gradient(135deg, #7C3AED, #A855F7);
+}
+.kpi-gradient-3 {
+  background: linear-gradient(135deg, #06B6D4, #22D3EE);
+}
+.kpi-gradient-4 {
+  background: linear-gradient(135deg, #22C55E, #4ADE80);
+}
+
+/* ============ Dark mode glass fix ============ */
+.dark .glass {
+  background: rgba(17, 24, 39, 0.8);
 }

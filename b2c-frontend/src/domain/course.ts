@@ -11,6 +11,7 @@ export interface Course {
   status: CourseStatus;
   progressPercent: number;
   moduleOrder: string[];
+  failureReason?: string | null;
 }
 
 export interface Module {

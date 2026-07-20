@@ -1,3 +1,6 @@
-// auth feature barrel
-// TODO: implement
-export {};
+export * as authApi from './authApi';
+export type { AuthResult, Credentials } from './authApi';
+export { useLogin, useSignup, useGoogleLogin, useLogout, useMe } from './useAuth';
+export { useAuthHydrated } from './useAuthHydrated';
+export { RequireAuth, RedirectIfAuthed } from './guards';
+export { AuthForm } from './AuthForm';

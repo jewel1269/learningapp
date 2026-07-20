@@ -14,26 +14,37 @@ Radix primitives (a11y) · Recharts (admin metrics).
 
 - ✅ **FP0 — Foundation & design system** (done: **design tokens** in `app/globals.css` — full palette (bg/ink/line/primary/semantic/6 pastel tints), light + **dark** via `.dark` class, mapped to Tailwind v4 utilities with `@theme inline` + `@custom-variant dark`; **Inter** (next/font, self-hosted — guaranteed) + Geist Mono in root layout with a **no-flash theme script** + `suppressHydrationWarning`; `cn()` util (clsx + tailwind-merge); **10 UI primitives** (`Button` w/ variants+sizes+loading, `Card`/Header/Body/Title/Description, `Badge`, `Input`, `Label`, `Skeleton`, `Spinner`, `Avatar`, `Progress`, `ThemeToggle`) + barrel; **providers** — `ThemeProvider` (via `useSyncExternalStore`, no setState-in-effect), real `QueryProvider` (TanStack Query), composed `AppProviders` wired into layout; **`authStore`** (zustand + persist) + **`apiClient`** (bearer token + **single-flight refresh-on-401** + typed `ApiError`); design-system **showcase** at `/`. Verified: **typecheck 0 · lint 0 errors · `next build` green** (12 routes). Notes: Next 16 breaking changes read from bundled docs — Turbopack default (no flag), async `params`/`searchParams` (for later route-param phases), `middleware`→`proxy` convention (existing `src/middleware.ts` builds as "Proxy"; migrate in FP2). Deps added: `@tanstack/react-query`, `zustand`, `clsx`, `tailwind-merge`, `lucide-react`.
 - ✅ **FP1 — Marketing / Landing** (done: approved Sastik-style landing built as real Next.js components using the FP0 design system, at `/` — **statically prerendered**; showcase moved to `/design`. Components in `src/components/marketing/`: `Container` (shared max-width), `Navbar` (client — sticky/scroll-glass, center links + carets, theme toggle, mobile menu), `Hero` (headline + gold-diamond icon + floating coins + feature tabs + dashboard mockup), `Sections` (Why problem/solution w/ SVG gauges, Features grid w/ pastel-tint cards + mini mockups, Lab band + terminal snippet, Stats gradient number, Process 3-steps + quiz mock, Domains 4 gradient cards, CTA), `Pricing` (client — monthly/yearly toggle), `Faq` (client — accordion), `Footer`. All using design tokens (`bg-primary`, `bg-tint-*`, `text-ink`, etc.) so light/dark both work; lucide icons; `buttonClasses()` helper added to Button so `<Link>` shares button styling. Verified: **typecheck 0 · lint 0 errors · `next build` green** (13 routes, `/` static). CTA/nav links point at `/signup` (built in FP2).
-- ⬜ FP2–FP13 — pending.
+  - **Redesigned to the "Bina B2C" teal edtech direction** (Hero with floating student avatars + framer-motion, `Categories` section, teal newsletter Footer; Poppins/Open Sans). **Design tokens in `globals.css` updated to teal + yellow accent** so all shared primitives + later phases inherit the new theme; `next build` green.
+- ✅ **FP2 — Auth** (done: `src/features/auth/` — `authApi` (signup/login/loginWithGoogle/getMe over `apiClient`), `useAuth` react-query mutations (`useLogin`→/dashboard, `useSignup`→/create-course, `useGoogleLogin`, `useLogout`) writing to the `authStore`; **hydration-safe route guards** (`RequireAuth`, `RedirectIfAuthed` via `useAuthHydrated` + `useSyncExternalStore` on zustand-persist — no logged-in user bounced on first paint); shared `AuthForm` (email/password, validation, show/hide, error surface, Google button gated on `NEXT_PUBLIC_GOOGLE_CLIENT_ID`) used by `/login` + `/signup`; branded `(auth)` layout (soft gradient card) wrapped in `RedirectIfAuthed`; `(app)` layout = `RequireAuth` + `AppTopbar` (logo, theme toggle, avatar, logout). **Next 16: deleted the deprecated `middleware.ts` stub** (proxy convention; JWT-in-localStorage → guards are client-side). Verified **typecheck 0 · lint 0 errors · `next build` green** (17 routes).
+  - **Fixed during audit (contract bugs the build couldn't catch):** (1) Google path was `/auth/google` but the backend route is `POST /auth/oauth/google` → corrected. (2) `useLogout` now calls `POST /auth/logout` (fire-and-forget) to **revoke the refresh-token family server-side** before clearing local state. Verified login/signup/refresh response contract is flat `{ user, accessToken, refreshToken }` (matches `AuthResult`).
+  - Notes: Google button is UI-wired but the GIS token flow needs `NEXT_PUBLIC_GOOGLE_CLIENT_ID` + client SDK; email/password works against the backend. **Not yet runtime-driven against a live backend** (no browser E2E yet — that's FP13); contract verified by reading the API.
+- ✅ **FP3 — Onboarding** (done: `coursesApi` (create/get/list) + `useCourses` hooks — `useCreateCourse` (mutation), `useCourse(id)` (**polls every 1.5s while `generating`**, stops on ready/failed), `useCourses`; **`CreateCourseWizard`** — 3-step flow (① subject + topic chips, ② level cards, ③ preference switches + review) → `POST /courses` → **`GeneratingPanel`** that polls and, on `ready`, routes to `/courses/[id]`; **failed → reason + Try again**; **403 free-tier limit → message + link to /courses**. Added `Switch` primitive + `failureReason` to the `Course` type; removed the dead `useCourseGeneration` stub. `(onboarding)` layout now wraps in `RequireAuth` (was unguarded). Verified **typecheck 0 · lint 0 errors · `next build` green** (13 routes).
+  - **Fixed during audit:** `GeneratingPanel` ignored the poll query's error state → an infinite spinner if a `GET /courses/:id` poll failed (network / expired session). Now a distinct "Lost connection" panel offers **Retry (refetch, not recreate)** so a transient failure can't spin forever or spawn a duplicate course.
+  - Note: not yet browser-driven against a live backend (contract matches `createCourseSchema`; E2E in FP13). `/courses/[id]` (the ready-redirect target) is still an FP5 stub.
+- ✅ **FP4 — Dashboard** (done: data hooks — `useMe` (GET /users/me, adds `streak`+`timezone` to the `User` type), `useMyAchievements` + `useAchievementCatalog` (gamification), `useSubscription` + `useCheckout`/`useBillingPortal` (subscription, for FP10); **dashboard page** — greeting + **streak pill**, **Continue-learning** card (first in-progress course w/ progress), **Your courses** grid (status-colored `CourseCard`s) with **empty first-run state** (create-first-course CTA), **Achievements teaser** (earned/total + badge icons → /achievements), **Plan** card (tier badge + Upgrade for free users), New-course quick action; all widgets have skeleton loading states. Enhanced `AppTopbar` with real nav (Dashboard/Courses/Achievements, active-highlight via `usePathname`). Verified **typecheck 0 · lint 0 errors · `next build` green** (13 routes; `/dashboard` is the post-login landing). Note: course cards link to `/courses/[id]` (fleshed out in FP5); not yet browser-driven against a live backend.
+- ⬜ FP5–FP13 — pending.
 
 ---
 
 ## 0. Design language
 
-- **Vibe:** modern, technical-but-approachable SaaS. Slightly "cyber" (this is a security/skills platform)
-  without being a hacker cliché. Confident whitespace, crisp type, purposeful motion.
-- **Theme:** dark-first with a proper light mode (both fully supported).
-- **Color:**
-  - Base neutrals (slate/zinc) for surfaces & text.
-  - **Primary accent:** electric indigo/violet (brand, CTAs, active states).
-  - **Secondary accent:** cyber-teal/green (labs, "live", success, streak fire).
-  - Semantic: success (emerald), warning (amber), danger (rose), info (sky).
-- **Type:** a clean geometric/grotesk sans for UI (e.g. Inter/Geist) + a **monospace** (Geist Mono) for
-  labs, terminal, code, and small technical labels.
-- **Radius/elevation:** medium rounded (rounded-xl), soft shadows, subtle borders; glassy nav on scroll.
-- **Motion:** small, fast, meaningful (hover lifts, tree reveal, streak flame, generation shimmer). Respect
-  `prefers-reduced-motion`.
-- **Imagery:** product mockups (course tree, terminal, SOC alerts) over stock photos.
+> **Current direction (Bina B2C):** friendly, bright education-platform look — soft pastel gradient blobs,
+> rounded cards, floating student avatars, purposeful motion (framer-motion). Light-first.
+
+- **Vibe:** warm, approachable, modern edtech marketplace. Generous whitespace, big rounded shapes, gentle motion.
+- **Theme:** light-first (the marketing site is a committed light design); the app/design-system also ships a
+  dark variant via tokens.
+- **Color (tokens in `app/globals.css`):**
+  - Neutrals: ink `#111827`, muted `#6B7280`, lines `#E7EAEF`; surfaces white / `#F6FAF9`.
+  - **Primary — brand teal:** `#0D6E63` (→ `#12A594` for gradients), soft `#E3F3F0` (`bg-primary`, `text-primary`).
+  - **Accent — yellow:** `#F7C948` (underlines, highlights, confetti) → `bg-accent`, `text-accent`.
+  - Soft pastel tints for cards/blobs: `tint-blue`, `tint-mint`, `tint-peach`, `tint-pink`, `tint-lime`, `tint-lav`.
+  - Semantic: success `#16A34A`, warning `#F59E0B`, danger `#EF4444`.
+- **Type:** **Poppins** for headings (`font-heading` / auto on `h1–h5`) + **Open Sans** for body (`font-sans`);
+  Geist Mono for code/labels. All via `next/font` (self-hosted).
+- **Radius/elevation:** large rounded (rounded-2xl / `rounded-[18–28px]`), soft shadows, subtle borders.
+- **Motion:** framer-motion for hero reveals + floating avatars; keep it gentle; respect `prefers-reduced-motion`.
+- **Imagery:** friendly avatars + product mockups; soft blurred gradient blobs as backdrops.
 
 ---
 

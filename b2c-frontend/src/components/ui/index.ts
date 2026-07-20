@@ -7,4 +7,5 @@ export { Skeleton } from './skeleton';
 export { Spinner } from './spinner';
 export { Avatar } from './avatar';
 export { Progress } from './progress';
+export { Switch } from './switch';
 export { ThemeToggle } from './theme-toggle';
