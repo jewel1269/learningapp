@@ -22,3 +22,11 @@ export function useCourse(id: string | null) {
 export function useCourses() {
   return useQuery({ queryKey: ['courses'], queryFn: coursesApi.listCourses });
 }
+
+export function useCourseStructure(id: string | null) {
+  return useQuery({
+    queryKey: ['course', id, 'structure'],
+    queryFn: () => coursesApi.getStructure(id as string),
+    enabled: Boolean(id),
+  });
+}

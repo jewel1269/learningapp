@@ -1,5 +1,29 @@
 import { apiClient } from '@/src/infrastructure/apiClient';
-import type { Course, CourseLevel } from '@/src/domain/course';
+import type { Course, CourseLevel, CourseStatus, Domain } from '@/src/domain/course';
+
+export interface StructureLesson {
+  id: string;
+  title: string;
+  order: number;
+}
+export interface StructureModule {
+  id: string;
+  title: string;
+  domain: Domain;
+  order: number;
+  lessonCount: number;
+  lessons: StructureLesson[];
+}
+export interface CourseStructure {
+  course: {
+    id: string;
+    title: string;
+    status: CourseStatus;
+    category: string;
+    level: CourseLevel;
+  };
+  modules: StructureModule[];
+}
 
 export interface CreateCourseInput {
   category: string;
@@ -23,4 +47,9 @@ export function getCourse(id: string): Promise<{ course: Course }> {
 
 export function listCourses(): Promise<{ courses: Course[] }> {
   return apiClient<{ courses: Course[] }>('/courses');
+}
+
+// Full Course → Module → Lesson tree (for the overview + the flow graph).
+export function getStructure(id: string): Promise<CourseStructure> {
+  return apiClient<CourseStructure>(`/courses/${id}/structure`);
 }

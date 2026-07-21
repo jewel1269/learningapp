@@ -6,7 +6,7 @@ export const COURSE_STATUS = ['generating', 'ready', 'failed', 'archived', 'comp
 export const TIER_LIMITS = {
   free: {
     activeCourses: 1,
-    courseGenerationsPerDay: 3,
+    courseGenerationsPerDay: 5,
     exerciseGenerationsPerDay: 20,
     quizGenerationsPerDay: 20,
     examGenerationsPerDay: 5,

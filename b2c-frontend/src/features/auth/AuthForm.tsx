@@ -1,16 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
-import { Button } from '@/src/components/ui/button';
-import { Input } from '@/src/components/ui/input';
-import { Label } from '@/src/components/ui/label';
-import { ApiError } from '@/src/infrastructure/apiClient';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  User,
+  ArrowRight,
+  ArrowLeft,
+  Globe,
+  Check,
+  ChevronDown,
+  Search,
+} from 'lucide-react';
 import { useLogin, useSignup } from './useAuth';
+import { ApiError } from '@/src/infrastructure/apiClient';
+import { PasswordStrength } from './PasswordStrength';
+import { AuthIllustration } from './AuthIllustration';
 
 const GOOGLE_ENABLED = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const TEAL = '#0D6E63';
+const TEAL_DARK = '#095c52';
+const GOLD = '#F7B928';
 
 export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const isSignup = mode === 'signup';
@@ -18,18 +34,24 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const signup = useSignup();
   const mutation = isSignup ? signup : login;
 
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [show, setShow] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [googleMsg, setGoogleMsg] = useState<string | null>(null);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const serverError = mutation.error instanceof ApiError ? mutation.error.message : null;
   const error = localError ?? serverError;
 
+  const isNameValid = fullName.trim().length > 0;
+  const isEmailValid = emailRe.test(email);
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLocalError(null);
+    if (isSignup && !fullName.trim()) return setLocalError('Enter your full name.');
     if (!emailRe.test(email)) return setLocalError('Enter a valid email address.');
     if (isSignup && password.length < 8)
       return setLocalError('Password must be at least 8 characters.');
@@ -37,105 +59,216 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
     mutation.mutate({ email: email.trim(), password });
   }
 
+  const inputBase =
+    'h-[52px] w-full rounded-lg border bg-white px-3 text-sm text-[#111827] outline-none placeholder:text-gray-400 transition-colors duration-200 dark:bg-[#1a2332] dark:text-gray-100';
+  const inputIdle = 'border-gray-200 hover:border-gray-300';
+  const inputFocus = 'border-[#0D6E63] ring-1 ring-[#0D6E63]/20';
+
   return (
-    <div className="w-full max-w-[420px]">
-      <div className="mb-8 text-center">
-        <Link href="/" className="mb-6 inline-flex items-center gap-2.5 text-xl font-extrabold">
-          <span className="grid size-9 place-items-center rounded-xl bg-primary text-[17px] font-bold text-primary-ink">
-            B
-          </span>
-          Bina B2C
-        </Link>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {isSignup ? 'Create your account' : 'Welcome back'}
-        </h1>
-        <p className="mt-1.5 text-sm text-ink-2">
-          {isSignup
-            ? 'Start building real skills in minutes — free.'
-            : 'Log in to continue learning.'}
-        </p>
-      </div>
-
-      <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@example.com"
-              className="pl-10"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+    <div className="flex min-h-screen w-full items-center justify-center bg-[#D4ECFF]/30 p-4 sm:p-6 lg:p-8">
+      <div className="flex w-full max-w-[1280px] overflow-hidden rounded-2xl border border-gray-200/80 bg-white dark:bg-[#0f1923]">
+        {/* ──────── Left Side: Form ──────── */}
+        <div className="flex w-full flex-col p-8 sm:w-[55%] sm:p-10 lg:p-12">
+          {/* Top nav */}
+          <div className="mb-8 flex items-center justify-between">
+            <Link
+              href="/"
+              className="flex size-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:border-gray-300 hover:text-gray-600"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="size-4" />
+            </Link>
+            <p className="text-sm text-gray-500">
+              {isSignup ? 'Already have an account? ' : "Don't have an account? "}
+              <Link
+                href={isSignup ? '/login' : '/signup'}
+                className="font-semibold text-[#0D6E63] transition-colors hover:text-[#095c52]"
+              >
+                {isSignup ? 'Sign In' : 'Sign Up'}
+              </Link>
+            </p>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="password">Password</Label>
-          <div className="relative">
-            <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
-            <Input
-              id="password"
-              type={show ? 'text' : 'password'}
-              autoComplete={isSignup ? 'new-password' : 'current-password'}
-              placeholder={isSignup ? 'At least 8 characters' : 'Your password'}
-              className="pl-10 pr-10"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          {/* Logo */}
+          <div className="mb-8 flex items-center gap-2.5">
+            <span className="grid size-9 place-items-center rounded-lg bg-[#0D6E63] text-[17px] font-bold text-white">
+              B
+            </span>
+            <span className="text-lg font-bold text-[#111827] dark:text-white">Bina B2C</span>
+          </div>
+
+          {/* Heading */}
+          <div className="mb-7">
+            <h1 className="text-3xl font-extrabold tracking-tight text-[#111827] sm:text-4xl dark:text-white">
+              {isSignup ? 'Create your account' : 'Welcome back'}
+            </h1>
+            <p className="mt-2 text-sm text-gray-500">
+              {isSignup
+                ? 'Start building real skills in minutes — free.'
+                : 'Log in to continue learning.'}
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+            {/* Full Name (signup only) */}
+            {isSignup && (
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="fullName" className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    id="fullName"
+                    type="text"
+                    autoComplete="name"
+                    placeholder="John Doe"
+                    className={`${inputBase} pl-10 pr-10 ${focusedField === 'fullName' ? inputFocus : inputIdle}`}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    onFocus={() => setFocusedField('fullName')}
+                    onBlur={() => setFocusedField(null)}
+                  />
+                  {isNameValid && (
+                    <span className="absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-[#0D6E63] text-white">
+                      <Check className="size-3" strokeWidth={3} />
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Email */}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="email" className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  className={`${inputBase} pl-10 pr-10 ${focusedField === 'email' ? inputFocus : inputIdle}`}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onFocus={() => setFocusedField('email')}
+                  onBlur={() => setFocusedField(null)}
+                />
+                {isEmailValid && (
+                  <span className="absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-[#0D6E63] text-white">
+                    <Check className="size-3" strokeWidth={3} />
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Password */}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="password" className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete={isSignup ? 'new-password' : 'current-password'}
+                  placeholder={isSignup ? 'At least 8 characters' : 'Your password'}
+                  className={`${inputBase} pl-10 pr-10 ${focusedField === 'password' ? inputFocus : inputIdle}`}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onFocus={() => setFocusedField('password')}
+                  onBlur={() => setFocusedField(null)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
+              {isSignup && <PasswordStrength password={password} />}
+            </div>
+
+            {/* Error */}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600"
+                  role="alert"
+                >
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={mutation.isPending}
+              className="flex h-[52px] w-full items-center justify-center gap-2 rounded-lg bg-[#0D6E63] text-sm font-semibold text-white transition-all duration-200 hover:bg-[#095c52] disabled:opacity-50"
+            >
+              {mutation.isPending
+                ? 'Please wait…'
+                : isSignup
+                  ? 'Sign Up'
+                  : 'Sign In'}
+              {!mutation.isPending && <ArrowRight className="size-4" />}
+            </button>
+          </form>
+
+          {/* OR divider */}
+          <div className="my-5 flex items-center gap-4">
+            <span className="h-px flex-1 bg-gray-200" />
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">OR</span>
+            <span className="h-px flex-1 bg-gray-200" />
+          </div>
+
+          {/* Social login */}
+          <div className="flex gap-3">
             <button
               type="button"
-              onClick={() => setShow((v) => !v)}
-              aria-label={show ? 'Hide password' : 'Show password'}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-3 hover:text-ink"
+              className="flex h-[52px] flex-1 items-center justify-center gap-2.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:bg-[#1a2332] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-[#1f2b3a]"
+              onClick={() =>
+                GOOGLE_ENABLED
+                  ? setGoogleMsg('Google sign-in flow will connect here.')
+                  : setGoogleMsg('Google sign-in isn\'t configured yet — use email for now.')
+              }
             >
-              {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              <GoogleMark />
+              Google
             </button>
+            <button
+              type="button"
+              className="flex h-[52px] flex-1 items-center justify-center gap-2.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:bg-[#1a2332] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-[#1f2b3a]"
+            >
+              <FacebookMark />
+              Facebook
+            </button>
+          </div>
+          {googleMsg && (
+            <p className="mt-2.5 text-center text-xs text-gray-400">{googleMsg}</p>
+          )}
+
+          {/* Language selector */}
+          <div className="mt-auto pt-8">
+            <AuthLanguageSelector />
           </div>
         </div>
 
-        {error && (
-          <p className="rounded-lg bg-bad-soft px-3.5 py-2.5 text-sm text-bad" role="alert">
-            {error}
-          </p>
-        )}
-
-        <Button type="submit" size="lg" loading={mutation.isPending} className="w-full">
-          {isSignup ? 'Create account' : 'Log in'}
-        </Button>
-      </form>
-
-      <div className="my-5 flex items-center gap-3 text-xs text-ink-3">
-        <span className="h-px flex-1 bg-line" /> OR <span className="h-px flex-1 bg-line" />
+        {/* ──────── Right Side: Illustration ──────── */}
+        <div className="hidden w-[45%] lg:block">
+          <AuthIllustration />
+        </div>
       </div>
-
-      <Button
-        type="button"
-        variant="soft"
-        size="lg"
-        className="w-full"
-        onClick={() =>
-          GOOGLE_ENABLED
-            ? setGoogleMsg('Google sign-in flow will connect here.')
-            : setGoogleMsg('Google sign-in isn’t configured yet — use email for now.')
-        }
-      >
-        <GoogleMark /> Continue with Google
-      </Button>
-      {googleMsg && <p className="mt-2 text-center text-xs text-ink-3">{googleMsg}</p>}
-
-      <p className="mt-6 text-center text-sm text-ink-2">
-        {isSignup ? 'Already have an account? ' : 'New to Bina? '}
-        <Link
-          href={isSignup ? '/login' : '/signup'}
-          className="font-semibold text-primary hover:underline"
-        >
-          {isSignup ? 'Log in' : 'Create one free'}
-        </Link>
-      </p>
     </div>
   );
 }
@@ -143,19 +276,139 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
 function GoogleMark() {
   return (
     <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
-      <path
-        fill="#4285F4"
-        d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1 .7-2.4 1.2-4 1.2-3 0-5.6-2-6.6-4.8H1.4v3C3.4 21.4 7.4 24 12 24z"
-      />
+      <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z" />
+      <path fill="#34A853" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1 .7-2.4 1.2-4 1.2-3 0-5.6-2-6.6-4.8H1.4v3C3.4 21.4 7.4 24 12 24z" />
       <path fill="#FBBC05" d="M5.4 14.5a7.2 7.2 0 0 1 0-4.6v-3H1.4a12 12 0 0 0 0 10.6l4-3z" />
+      <path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4C17.9 1.2 15.2 0 12 0 7.4 0 3.4 2.6 1.4 6.4l4 3C6.4 6.7 9 4.8 12 4.8z" />
+    </svg>
+  );
+}
+
+function FacebookMark() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
       <path
-        fill="#EA4335"
-        d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4C17.9 1.2 15.2 0 12 0 7.4 0 3.4 2.6 1.4 6.4l4 3C6.4 6.7 9 4.8 12 4.8z"
+        fill="#1877F2"
+        d="M24 12c0-6.627-5.373-12-12-12S0 5.373 0 12c0 5.99 4.388 10.954 10.125 11.854V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874V12h3.328l-.532 3.47h-2.796v8.385C19.612 22.954 24 17.99 24 12z"
       />
     </svg>
+  );
+}
+
+const LANGUAGES = [
+  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
+  { code: 'bn', name: 'Bengali', nativeName: 'বাংলা', flag: '🇧🇩' },
+  { code: 'he', name: 'Hebrew', nativeName: 'עברית', flag: '🇮🇱' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
+  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
+  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵' },
+];
+
+function AuthLanguageSelector() {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState('en');
+  const [search, setSearch] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  const current = LANGUAGES.find((l) => l.code === selected)!;
+
+  const filtered = LANGUAGES.filter(
+    (l) =>
+      l.name.toLowerCase().includes(search.toLowerCase()) ||
+      l.nativeName.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch('');
+      }
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') { setOpen(false); setSearch(''); }
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (open && searchRef.current) searchRef.current.focus();
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => { setOpen(!open); setSearch(''); }}
+        className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+      >
+        <Globe className="size-3.5" />
+        <span>{current.flag} {current.code.toUpperCase()}</span>
+        <ChevronDown className={`size-3 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.12 }}
+            className="absolute bottom-full left-0 z-50 mb-2 w-[220px] overflow-hidden rounded-lg border border-gray-200 bg-white"
+          >
+            <div className="border-b border-gray-100 p-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-gray-400" />
+                <input
+                  ref={searchRef}
+                  type="text"
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="h-8 w-full rounded-md border-0 bg-gray-50 pl-8 pr-2 text-xs text-gray-700 outline-none placeholder:text-gray-400 focus:bg-gray-100"
+                />
+              </div>
+            </div>
+            <div className="max-h-[240px] overflow-y-auto p-1">
+              {filtered.length === 0 ? (
+                <div className="py-4 text-center text-xs text-gray-400">No results</div>
+              ) : (
+                filtered.map((lang) => (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    onClick={() => {
+                      setSelected(lang.code);
+                      setOpen(false);
+                      setSearch('');
+                    }}
+                    className={`flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-xs transition-colors ${
+                      lang.code === selected
+                        ? 'bg-[#0D6E63]/10 text-[#0D6E63]'
+                        : 'text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="text-sm">{lang.flag}</span>
+                    <span className="flex-1 font-medium">{lang.name}</span>
+                    {lang.code === selected && <Check className="size-3.5 text-[#0D6E63]" />}
+                  </button>
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

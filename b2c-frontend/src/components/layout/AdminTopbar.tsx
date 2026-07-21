@@ -70,7 +70,7 @@ function getPageTitle(pathname: string): string {
 
 export function AdminTopbar() {
   const pathname = usePathname();
-  const { collapsed, openMobile } = useSidebar();
+  const { openMobile, toggle: toggleSidebar } = useSidebar();
   const { theme, toggle } = useTheme();
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -78,12 +78,8 @@ export function AdminTopbar() {
   const pageTitle = getPageTitle(pathname);
 
   return (
-    <header
-      className={cn(
-        'sticky top-0 z-20 flex h-[72px] items-center border-b border-[#F1F5F9] bg-white transition-all duration-300',
-        collapsed ? 'lg:pl-[72px]' : 'lg:pl-[270px]',
-      )}
-    >
+    <header className="sticky top-0 z-20 flex h-[72px] items-center border-b border-[#F1F5F9] bg-white transition-all duration-300">
+      {/* No sidebar offset here — the (app) layout wrapper already applies lg:pl-[270px]. */}
       <div className="flex w-full items-center justify-between pl-4 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
         {/* ─── LEFT: Hamburger + Title + Search ─── */}
         <div className="flex items-center gap-4">
@@ -96,8 +92,9 @@ export function AdminTopbar() {
             <Menu className="size-5" />
           </button>
 
-          {/* Desktop hamburger */}
+          {/* Desktop hamburger — collapses/expands the sidebar rail */}
           <button
+            onClick={toggleSidebar}
             className="hidden size-10 shrink-0 items-center justify-center rounded-xl text-ink-2 transition-colors hover:bg-[#F8F9FB] hover:text-ink lg:flex"
             aria-label="Toggle sidebar"
           >
@@ -107,7 +104,7 @@ export function AdminTopbar() {
           {/* Dynamic page title */}
           <h1
             key={pathname}
-            className="animate-fade-in shrink-0 text-[28px] font-semibold leading-none tracking-[-0.025em] text-[#0F172A]"
+            className="animate-fade-in shrink-0 text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#0F172A]"
           >
             {pageTitle}
           </h1>

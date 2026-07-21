@@ -51,6 +51,8 @@ export async function createCourse(userId: string, input: CreateCourseInput) {
     { courseId: String(course._id) },
     { priority: jobPriority(user.tier as string) },
   );
+
+  console.log("Hello Jewel",course)
   return course;
 }
 

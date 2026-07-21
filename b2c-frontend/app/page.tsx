@@ -21,7 +21,7 @@ export default function LandingPage() {
       <main>
         <Hero />
         <Categories />
-        <WhySection />
+        {/* <WhySection />
         <FeaturesSection />
         <LabBand />
         <StatsSection />
@@ -29,7 +29,7 @@ export default function LandingPage() {
         <DomainsSection />
         <Pricing />
         <Faq />
-        <CtaSection />
+        <CtaSection /> */}
       </main>
       <Footer />
     </>
