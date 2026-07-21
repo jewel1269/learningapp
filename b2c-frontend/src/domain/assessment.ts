@@ -49,3 +49,43 @@ export interface AssessmentSubmission {
   score: number; // 0–100
   submittedAt: string;
 }
+
+export type SkillLevel = 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+
+export interface SkillAssessment {
+  id: string;
+  topic: string;
+  customTopic: string | null;
+  questions: AssessmentQuestion[];
+  generatedAt: string;
+}
+
+export interface SkillAssessmentSubmission extends AssessmentSubmission {
+  assessmentId: string;
+  level: SkillLevel;
+}
+
+export type SkillAssessmentStatus = 'pending' | 'completed';
+
+export interface SkillAssessmentSummary {
+  id: string;
+  topic: string;
+  customTopic: string | null;
+  topicLabel: string;
+  questionCount: number;
+  generatedAt: string;
+  expiresAt: string;
+  status: SkillAssessmentStatus;
+  submission?: {
+    score: number;
+    level: SkillLevel;
+    submittedAt: string;
+  };
+}
+
+export interface SkillAssessmentQuota {
+  tier: string;
+  limit: number | null;
+  used: number;
+  remaining: number | null;
+}

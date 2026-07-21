@@ -5,7 +5,7 @@ import { Key, Mail, Shield } from 'lucide-react';
 
 export function AuthIllustration() {
   return (
-    <div className="relative flex h-full min-h-[600px] items-center justify-center overflow-hidden rounded-r-2xl bg-[#0D6E63]">
+    <div className="relative flex h-full min-h-[600px] items-center justify-center overflow-hidden rounded-r-2xl bg-[linear-gradient(160deg,var(--primary)_0%,var(--primary-dark)_100%)]">
       {/* Subtle background shapes */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[12%] top-[18%] size-36 rotate-45 rounded-xl border border-white/10 bg-white/5" />
@@ -28,7 +28,7 @@ export function AuthIllustration() {
                 <p className="text-xl font-bold text-white">176,18</p>
               </div>
             </div>
-            <div className="flex size-9 items-center justify-center rounded-full bg-[#F7B928] text-xs font-bold text-[#111827]">
+            <div className="flex size-9 items-center justify-center rounded-full bg-secondary text-xs font-bold text-white">
               45
             </div>
           </div>
@@ -73,8 +73,8 @@ export function AuthIllustration() {
         {/* Security card */}
         <div className="w-full rounded-xl border border-white/15 bg-white/10 p-5 backdrop-blur-sm">
           <div className="mb-3 flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-[#F7B928]/20">
-              <Key className="size-4 text-[#F7B928]" />
+            <div className="flex size-9 items-center justify-center rounded-lg bg-secondary/20">
+              <Key className="size-4 text-secondary" />
             </div>
             <p className="text-sm font-bold text-white">Your data, your rules</p>
           </div>
@@ -90,7 +90,7 @@ export function AuthIllustration() {
 
         {/* Shield badge */}
         <div className="flex items-center gap-2.5 rounded-lg border border-white/15 bg-white/10 px-4 py-2.5 backdrop-blur-sm">
-          <Shield className="size-4 text-[#F7B928]" />
+          <Shield className="size-4 text-secondary" />
           <span className="text-xs font-medium text-white/80">256-bit SSL Encrypted</span>
         </div>
       </div>

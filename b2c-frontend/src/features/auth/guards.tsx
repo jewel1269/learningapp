@@ -16,14 +16,20 @@ function FullScreen() {
 
 // Protects authenticated routes. Waits for store hydration before deciding, so a
 // logged-in user isn't bounced to /login on first paint.
-export function RequireAuth({ children }: { children: React.ReactNode }) {
+export function RequireAuth({
+  children,
+  redirectTo = '/login',
+}: {
+  children: React.ReactNode;
+  redirectTo?: string;
+}) {
   const router = useRouter();
   const hydrated = useAuthHydrated();
   const token = useAuthStore((s) => s.accessToken);
 
   useEffect(() => {
-    if (hydrated && !token) router.replace('/login');
-  }, [hydrated, token, router]);
+    if (hydrated && !token) router.replace(redirectTo);
+  }, [hydrated, token, router, redirectTo]);
 
   if (!hydrated) return <FullScreen />;
   if (!token) return null; // redirecting
@@ -42,7 +48,11 @@ export function RedirectIfAuthed({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!hydrated || decided.current) return;
     decided.current = true;
-    if (useAuthStore.getState().accessToken) router.replace('/dashboard');
+    if (useAuthStore.getState().accessToken) {
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get('redirect');
+      router.replace(redirect?.startsWith('/') ? redirect : '/dashboard');
+    }
   }, [hydrated, router]);
 
   return <>{children}</>;

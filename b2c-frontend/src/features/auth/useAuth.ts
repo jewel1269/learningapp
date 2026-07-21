@@ -5,6 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/src/store/authStore';
 import * as authApi from './authApi';
 
+function navigateAfterAuth(router: ReturnType<typeof useRouter>, defaultPath: string) {
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get('redirect');
+  router.push(redirect?.startsWith('/') ? redirect : defaultPath);
+}
+
 export function useMe() {
   return useQuery({ queryKey: ['me'], queryFn: authApi.getMe });
 }
@@ -16,7 +22,7 @@ export function useLogin() {
     mutationFn: authApi.login,
     onSuccess: (data) => {
       setAuth(data);
-      router.push('/dashboard');
+      navigateAfterAuth(router, '/dashboard');
     },
   });
 }
@@ -28,7 +34,7 @@ export function useSignup() {
     mutationFn: authApi.signup,
     onSuccess: (data) => {
       setAuth(data);
-      router.push('/create-course');
+      navigateAfterAuth(router, '/create-course');
     },
   });
 }
@@ -40,7 +46,7 @@ export function useGoogleLogin() {
     mutationFn: authApi.loginWithGoogle,
     onSuccess: (data) => {
       setAuth(data);
-      router.push('/dashboard');
+      navigateAfterAuth(router, '/dashboard');
     },
   });
 }

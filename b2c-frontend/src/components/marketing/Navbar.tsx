@@ -1,152 +1,227 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowRight, GraduationCap, Menu, Search, X } from 'lucide-react';
+import { Menu, Search, UserRound, X } from 'lucide-react';
+import { LanguageSelector } from '@/src/components/layout/LanguageSelector';
+import { NAV_LINKS } from './data';
+import { Container } from './Container';
 
-const NAV_LINKS = [
-  { label: 'Home', href: '#top' },
-  { label: 'Learning Path', href: '#pages' },
-  { label: 'Courses', href: '#courses' },
-  { label: 'Contact', href: '#contact' },
-];
+function FiStudyLogo() {
+  return (
+    <Link href="/" className="relative inline-flex shrink-0 flex-col leading-none text-primary" aria-label="FiStudy Home">
+      <span className="text-[34px] font-bold tracking-[-0.02em]">
+        <span className="text-primary">AI</span>
+        <span className="text-ink">Study</span>
+      </span>
+      <svg
+        className="absolute -bottom-1 left-[34px] h-[10px] w-[72px]"
+        viewBox="0 0 72 10"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M2 8C18 2 34 1 70 6"
+          stroke="currentColor"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+      </svg>
+    </Link>
+  );
+}
+
+function NavDivider() {
+  return <span className="hidden h-10 w-px bg-line-2 lg:block" aria-hidden="true" />;
+}
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+
+    searchInputRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSearchOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [searchOpen]);
+
+  const openSearch = () => {
+    setMobileOpen(false);
+    setSearchOpen(true);
+  };
 
   return (
-    <motion.header
-      className="absolute left-0 right-0 top-6 z-50 px-6"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-    >
-      <div className="mx-auto flex h-[84px] max-w-[1280px] items-center rounded-[18px] border border-white/55 bg-white/92 px-8 shadow-[0_20px_60px_rgba(16,24,40,0.08)] backdrop-blur-[18px]">
-        {/* ─── LEFT: Logo ─── */}
-        <Link href="#top" className="relative z-10 flex shrink-0 items-center gap-2.5" aria-label="Educeed Home">
-          <span className="relative flex flex-col items-center leading-none">
-            <GraduationCap className="h-[18px] w-[18px] text-[#0D6E63]" strokeWidth={2.2} />
-            <span className="mt-0.5 grid size-8 place-items-center rounded-full border-[2.5px] border-[#0D6E63] text-[11px] font-bold text-[#0D6E63]">
-              e
+    <>
+      <div
+        className={`fixed inset-x-0 top-0 z-[60] bg-primary shadow-[var(--shadow-primary)] transition-transform duration-300 ease-out ${
+          searchOpen ? 'translate-y-0' : '-translate-y-full'
+        }`}
+        aria-hidden={!searchOpen}
+      >
+        <Container className="flex h-20 items-center gap-4">
+          <div className="mx-auto flex w-full max-w-[760px] flex-1 items-stretch">
+            <span className="grid w-14 shrink-0 place-items-center bg-ink text-white">
+              <Search className="size-5" strokeWidth={2} />
             </span>
-          </span>
-          <span
-            className="text-[28px] font-bold leading-none tracking-tight"
-            style={{ fontFamily: 'var(--font-poppins)' }}
-          >
-            <span className="text-[#1F2937]">Bina</span>
-            <span className="font-normal text-[#6B7280]">B2C</span>
-          </span>
-        </Link>
-
-        {/* ─── CENTER: Nav links ─── */}
-        <nav
-          className="relative z-10 mx-auto hidden items-center gap-[44px] lg:flex"
-          role="navigation"
-          aria-label="Main navigation"
-        >
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="nav-link group relative py-2 text-[16px] font-medium text-[#111827] transition-colors duration-250 hover:text-[#0D6E63]"
-              style={{ fontFamily: 'var(--font-poppins)' }}
-            >
-              {link.label}
-              <span className="nav-underline" />
-            </a>
-          ))}
-        </nav>
-
-        {/* ─── RIGHT: Actions ─── */}
-        <div className="relative z-10 hidden items-center gap-6 lg:flex">
-          {/* Search Icon */}
+            <input
+              ref={searchInputRef}
+              type="search"
+              placeholder="Search Here"
+              tabIndex={searchOpen ? 0 : -1}
+              className="h-14 flex-1 bg-white px-4 text-[15px] text-ink outline-none placeholder:text-ink-2"
+            />
+          </div>
           <button
             type="button"
-            aria-label="Search"
-            className="inline-flex size-10 items-center justify-center rounded-full transition-all duration-250 hover:bg-[#F3F4F6] hover:text-[#0D6E63] hover:scale-110"
+            aria-label="Close search"
+            onClick={() => setSearchOpen(false)}
+            tabIndex={searchOpen ? 0 : -1}
+            className="grid size-12 shrink-0 place-items-center bg-primary-dark/70 text-white transition-colors hover:bg-primary-dark"
           >
-            <Search className="size-6 text-[#374151]" />
+            <X className="size-5" strokeWidth={2.5} />
           </button>
-
-          {/* Login / Register */}
-          <Link
-            href="/login"
-            className="text-[16px] font-medium text-[#1F2937] transition-colors duration-250 hover:text-[#0D6E63]"
-            style={{ fontFamily: 'var(--font-poppins)' }}
-          >
-            Login / Register
-          </Link>
-
-          {/* Apply Now Button */}
-          <Link
-            href="/signup"
-            aria-label="Apply now"
-            className="group inline-flex h-12 items-center gap-2.5 rounded-xl bg-[#F7B928] px-[30px] text-[16px] font-semibold text-[#111827] shadow-[0_4px_14px_rgba(247,185,40,0.35)] transition-all duration-300 hover:-translate-y-[2px] hover:bg-[#E5A920] hover:shadow-[0_8px_20px_rgba(247,185,40,0.4)]"
-            style={{ fontFamily: 'var(--font-poppins)' }}
-          >
-            Upgrade Now
-            <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
-          </Link>
-        </div>
-
-        {/* ─── MOBILE: Hamburger ─── */}
-        <div className="relative z-10 ml-auto flex items-center gap-3 lg:hidden">
-          <Link
-            href="/signup"
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-[#F7B928] px-4 text-[14px] font-semibold text-[#111827]"
-            style={{ fontFamily: 'var(--font-poppins)' }}
-          >
-            Apply Now
-          </Link>
-          <button
-            type="button"
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            onClick={() => setMobileOpen((v) => !v)}
-            className="grid size-10 place-items-center rounded-xl border border-[#E5E7EB] bg-white/80 text-[#374151] backdrop-blur-sm"
-          >
-            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-          </button>
-        </div>
+        </Container>
       </div>
 
-      {/* ─── MOBILE: Dropdown menu ─── */}
-      {mobileOpen && (
-        <motion.nav
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-          className="mx-auto mt-2 max-w-[1280px] rounded-2xl border border-white/55 bg-white/95 px-6 py-4 shadow-[0_20px_60px_rgba(16,24,40,0.12)] backdrop-blur-[18px] lg:hidden"
-          role="navigation"
-          aria-label="Mobile navigation"
-        >
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="block py-3 text-[16px] font-medium text-[#111827] transition-colors duration-250 hover:text-[#0D6E63]"
-              style={{ fontFamily: 'var(--font-poppins)' }}
-            >
-              {link.label}
-            </a>
-          ))}
+      <header className="sticky top-0 z-50 border-b border-line bg-[linear-gradient(90deg,color-mix(in_srgb,var(--primary-soft)_55%,white)_0%,#FFFFFF_18%,#FFFFFF_82%,color-mix(in_srgb,var(--primary-soft)_55%,white)_100%)] shadow-[0_4px_24px_rgba(15,23,42,0.04)]">
+        <Container className="flex h-[88px] items-center justify-between gap-6">
+          <FiStudyLogo />
 
-          <div className="mt-3 flex flex-col gap-3 border-t border-[#E5E7EB] pt-3">
-            <Link
-              href="/login"
-              className="text-center text-[15px] font-medium text-[#1F2937]"
-              style={{ fontFamily: 'var(--font-poppins)' }}
+          <nav
+            className="hidden flex-1 items-center justify-center gap-[36px] xl:flex"
+            aria-label="Main navigation"
+          >
+            {NAV_LINKS.map((link) =>
+              link.href.startsWith('/') ? (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="text-[18px] font-medium text-ink transition-colors hover:text-primary"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="text-[18px] font-medium text-ink transition-colors hover:text-primary"
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
+          </nav>
+
+          <div className="hidden items-center gap-2 lg:flex">
+            <button
+              type="button"
+              aria-label="Search"
+              aria-expanded={searchOpen}
+              onClick={openSearch}
+              className="text-primary transition-colors hover:text-primary-dark"
             >
-              Login / Register
-            </Link>
+              <Search className="size-[22px]" strokeWidth={2} />
+            </button>
+
+            <NavDivider />
+
+            <LanguageSelector compact />
+
+            <NavDivider />
+
+            <div className="flex items-center gap-2">
+              <Link
+                href="/login"
+                className="relative grid size-11 place-items-center rounded-full border border-line-2 text-ink transition-opacity hover:opacity-85"
+                aria-label="Sign in"
+              >
+                <UserRound className="size-5" strokeWidth={1.8} />
+                <span className="absolute -bottom-0.5 -right-0.5 grid size-4 place-items-center rounded-full border border-white bg-primary text-[10px] font-bold text-primary-ink">
+                  +
+                </span>
+              </Link>
+              <span className="flex flex-col leading-tight">
+                <Link
+                  href="/login"
+                  className="text-[15px] font-bold text-ink transition-colors hover:text-primary"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="text-[13px] font-medium text-ink-3 transition-colors hover:text-primary"
+                >
+                  Register
+                </Link>
+              </span>
+            </div>
           </div>
-        </motion.nav>
-      )}
 
-      {/* ─── Bottom accent strip ─── */}
-      <div className="mx-auto h-1 max-w-[1265px] rounded-b-[80px] bg-[#0D6E63]" />
-    </motion.header>
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={openSearch}
+              className="grid size-10 place-items-center text-primary"
+            >
+              <Search className="size-5" />
+            </button>
+            <button
+              type="button"
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              onClick={() => setMobileOpen((v) => !v)}
+              className="grid size-10 place-items-center rounded-lg border border-line text-ink-2"
+            >
+              {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            </button>
+          </div>
+        </Container>
+
+        {mobileOpen ? (
+          <nav className="border-t border-line bg-white px-4 py-4 lg:hidden">
+            {NAV_LINKS.map((link) =>
+              link.href.startsWith('/') ? (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="block border-b border-bg-soft py-3 text-[15px] font-medium text-ink"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="block border-b border-bg-soft py-3 text-[15px] font-medium text-ink"
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
+
+            <div className="mt-5 space-y-4 border-t border-bg-soft pt-5">
+              <LanguageSelector />
+              <Link href="/login" className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-full border border-line-2">
+                  <UserRound className="size-5" />
+                </span>
+                <span>
+                  <span className="block text-sm font-bold text-ink">Sign in</span>
+                  <span className="block text-xs text-ink-3">Register</span>
+                </span>
+              </Link>
+            </div>
+          </nav>
+        ) : null}
+      </header>
+    </>
   );
 }

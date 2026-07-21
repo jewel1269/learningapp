@@ -12,6 +12,13 @@ const userSchema = new Schema(
       visualsPreferred: { type: Boolean, default: false },
       dailyNotification: { type: Boolean, default: false },
       timezone: { type: String, default: 'UTC' },
+      skillAssessment: {
+        topic: String,
+        customTopic: String,
+        level: String,
+        score: Number,
+        assessedAt: Date,
+      },
     },
     streak: {
       current: { type: Number, default: 0 },

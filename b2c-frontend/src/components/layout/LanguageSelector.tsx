@@ -25,7 +25,7 @@ const languages: Language[] = [
   { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵' },
 ];
 
-export function LanguageSelector() {
+export function LanguageSelector({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState('en');
   const [search, setSearch] = useState('');
@@ -82,7 +82,8 @@ export function LanguageSelector() {
           setSearch('');
         }}
         className={cn(
-          'flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-all duration-200',
+          'flex items-center gap-1.5 rounded-full text-sm font-medium transition-all duration-200',
+          compact ? 'px-2 py-1.5' : 'gap-2 px-3 py-2',
           open
             ? 'bg-[#F8F9FB] text-ink'
             : 'text-ink-2 hover:bg-[#F8F9FB] hover:text-ink',

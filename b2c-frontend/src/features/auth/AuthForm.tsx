@@ -24,15 +24,23 @@ import { AuthIllustration } from './AuthIllustration';
 const GOOGLE_ENABLED = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const TEAL = '#0D6E63';
-const TEAL_DARK = '#095c52';
-const GOLD = '#F7B928';
+function authSwitchHref(mode: 'login' | 'signup') {
+  if (typeof window === 'undefined') return mode === 'login' ? '/login' : '/signup';
+  const redirect = new URLSearchParams(window.location.search).get('redirect');
+  const base = mode === 'login' ? '/login' : '/signup';
+  return redirect ? `${base}?redirect=${encodeURIComponent(redirect)}` : base;
+}
 
 export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const isSignup = mode === 'signup';
   const login = useLogin();
   const signup = useSignup();
   const mutation = isSignup ? signup : login;
+  const [switchHref, setSwitchHref] = useState(isSignup ? '/login' : '/signup');
+
+  useEffect(() => {
+    setSwitchHref(authSwitchHref(isSignup ? 'login' : 'signup'));
+  }, [isSignup]);
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -60,29 +68,29 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   }
 
   const inputBase =
-    'h-[52px] w-full rounded-lg border bg-white px-3 text-sm text-[#111827] outline-none placeholder:text-gray-400 transition-colors duration-200 dark:bg-[#1a2332] dark:text-gray-100';
-  const inputIdle = 'border-gray-200 hover:border-gray-300';
-  const inputFocus = 'border-[#0D6E63] ring-1 ring-[#0D6E63]/20';
+    'h-[52px] w-full rounded-lg border bg-white px-3 text-sm text-ink outline-none placeholder:text-ink-3 transition-colors duration-200 dark:bg-bg-soft dark:text-ink';
+  const inputIdle = 'border-line hover:border-line-2';
+  const inputFocus = 'border-primary ring-1 ring-primary/20';
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[#D4ECFF]/30 p-4 sm:p-6 lg:p-8">
-      <div className="flex w-full max-w-[1280px] overflow-hidden rounded-2xl border border-gray-200/80 bg-white dark:bg-[#0f1923]">
+    <div className="flex min-h-screen w-full items-center justify-center bg-primary-soft/40 p-4 sm:p-6 lg:p-8">
+      <div className="flex w-full max-w-[1280px] overflow-hidden rounded-2xl border border-line bg-white dark:bg-bg-soft">
         {/* ──────── Left Side: Form ──────── */}
         <div className="flex w-full flex-col p-8 sm:w-[55%] sm:p-10 lg:p-12">
           {/* Top nav */}
           <div className="mb-8 flex items-center justify-between">
             <Link
               href="/"
-              className="flex size-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:border-gray-300 hover:text-gray-600"
+              className="flex size-9 items-center justify-center rounded-lg border border-line text-ink-3 transition-colors hover:border-line-2 hover:text-ink-2"
               aria-label="Go back"
             >
               <ArrowLeft className="size-4" />
             </Link>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-ink-2">
               {isSignup ? 'Already have an account? ' : "Don't have an account? "}
               <Link
-                href={isSignup ? '/login' : '/signup'}
-                className="font-semibold text-[#0D6E63] transition-colors hover:text-[#095c52]"
+                href={switchHref}
+                className="font-semibold text-primary transition-colors hover:text-primary-dark"
               >
                 {isSignup ? 'Sign In' : 'Sign Up'}
               </Link>
@@ -91,18 +99,18 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
 
           {/* Logo */}
           <div className="mb-8 flex items-center gap-2.5">
-            <span className="grid size-9 place-items-center rounded-lg bg-[#0D6E63] text-[17px] font-bold text-white">
+            <span className="grid size-9 place-items-center rounded-lg bg-primary text-[17px] font-bold text-white">
               B
             </span>
-            <span className="text-lg font-bold text-[#111827] dark:text-white">Bina B2C</span>
+            <span className="text-lg font-bold text-ink dark:text-white">Bina B2C</span>
           </div>
 
           {/* Heading */}
           <div className="mb-7">
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#111827] sm:text-4xl dark:text-white">
+            <h1 className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl dark:text-white">
               {isSignup ? 'Create your account' : 'Welcome back'}
             </h1>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-ink-2">
               {isSignup
                 ? 'Start building real skills in minutes — free.'
                 : 'Log in to continue learning.'}
@@ -114,11 +122,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
             {/* Full Name (signup only) */}
             {isSignup && (
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="fullName" className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                <label htmlFor="fullName" className="text-sm font-medium text-ink-2 dark:text-ink-3">
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                  <User className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
                   <input
                     id="fullName"
                     type="text"
@@ -131,7 +139,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
                     onBlur={() => setFocusedField(null)}
                   />
                   {isNameValid && (
-                    <span className="absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-[#0D6E63] text-white">
+                    <span className="absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-white">
                       <Check className="size-3" strokeWidth={3} />
                     </span>
                   )}
@@ -141,11 +149,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
 
             {/* Email */}
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              <label htmlFor="email" className="text-sm font-medium text-ink-2 dark:text-ink-3">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
                 <input
                   id="email"
                   type="email"
@@ -158,7 +166,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
                   onBlur={() => setFocusedField(null)}
                 />
                 {isEmailValid && (
-                  <span className="absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-[#0D6E63] text-white">
+                  <span className="absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-white">
                     <Check className="size-3" strokeWidth={3} />
                   </span>
                 )}
@@ -167,11 +175,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
 
             {/* Password */}
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="password" className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              <label htmlFor="password" className="text-sm font-medium text-ink-2 dark:text-ink-3">
                 Password
               </label>
               <div className="relative">
-                <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -187,7 +195,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-3 transition-colors hover:text-ink-2"
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -202,7 +210,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
-                  className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600"
+                  className="rounded-lg bg-bad-soft px-4 py-2.5 text-sm text-bad"
                   role="alert"
                 >
                   {error}
@@ -214,7 +222,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="flex h-[52px] w-full items-center justify-center gap-2 rounded-lg bg-[#0D6E63] text-sm font-semibold text-white transition-all duration-200 hover:bg-[#095c52] disabled:opacity-50"
+              className="flex h-[52px] w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-white shadow-[var(--shadow-primary)] transition-all duration-200 hover:bg-primary-dark disabled:opacity-50"
             >
               {mutation.isPending
                 ? 'Please wait…'
@@ -227,16 +235,16 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
 
           {/* OR divider */}
           <div className="my-5 flex items-center gap-4">
-            <span className="h-px flex-1 bg-gray-200" />
-            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">OR</span>
-            <span className="h-px flex-1 bg-gray-200" />
+            <span className="h-px flex-1 bg-line" />
+            <span className="text-xs font-medium uppercase tracking-wider text-ink-3">OR</span>
+            <span className="h-px flex-1 bg-line" />
           </div>
 
           {/* Social login */}
           <div className="flex gap-3">
             <button
               type="button"
-              className="flex h-[52px] flex-1 items-center justify-center gap-2.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:bg-[#1a2332] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-[#1f2b3a]"
+              className="flex h-[52px] flex-1 items-center justify-center gap-2.5 rounded-lg border border-line bg-white text-sm font-medium text-ink-2 transition-colors hover:bg-bg-soft dark:bg-bg-soft dark:hover:bg-bg-lav"
               onClick={() =>
                 GOOGLE_ENABLED
                   ? setGoogleMsg('Google sign-in flow will connect here.')
@@ -248,14 +256,14 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
             </button>
             <button
               type="button"
-              className="flex h-[52px] flex-1 items-center justify-center gap-2.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:bg-[#1a2332] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-[#1f2b3a]"
+              className="flex h-[52px] flex-1 items-center justify-center gap-2.5 rounded-lg border border-line bg-white text-sm font-medium text-ink-2 transition-colors hover:bg-bg-soft dark:bg-bg-soft dark:hover:bg-bg-lav"
             >
               <FacebookMark />
               Facebook
             </button>
           </div>
           {googleMsg && (
-            <p className="mt-2.5 text-center text-xs text-gray-400">{googleMsg}</p>
+            <p className="mt-2.5 text-center text-xs text-ink-3">{googleMsg}</p>
           )}
 
           {/* Language selector */}
@@ -351,7 +359,7 @@ function AuthLanguageSelector() {
       <button
         type="button"
         onClick={() => { setOpen(!open); setSearch(''); }}
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-ink-2 transition-colors hover:bg-bg-soft hover:text-ink"
       >
         <Globe className="size-3.5" />
         <span>{current.flag} {current.code.toUpperCase()}</span>
@@ -365,24 +373,24 @@ function AuthLanguageSelector() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 4 }}
             transition={{ duration: 0.12 }}
-            className="absolute bottom-full left-0 z-50 mb-2 w-[220px] overflow-hidden rounded-lg border border-gray-200 bg-white"
+            className="absolute bottom-full left-0 z-50 mb-2 w-[220px] overflow-hidden rounded-lg border border-line bg-white"
           >
-            <div className="border-b border-gray-100 p-2">
+            <div className="border-b border-line p-2">
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-ink-3" />
                 <input
                   ref={searchRef}
                   type="text"
                   placeholder="Search..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="h-8 w-full rounded-md border-0 bg-gray-50 pl-8 pr-2 text-xs text-gray-700 outline-none placeholder:text-gray-400 focus:bg-gray-100"
+                  className="h-8 w-full rounded-md border-0 bg-bg-soft pl-8 pr-2 text-xs text-ink outline-none placeholder:text-ink-3 focus:bg-bg-lav"
                 />
               </div>
             </div>
             <div className="max-h-[240px] overflow-y-auto p-1">
               {filtered.length === 0 ? (
-                <div className="py-4 text-center text-xs text-gray-400">No results</div>
+                <div className="py-4 text-center text-xs text-ink-3">No results</div>
               ) : (
                 filtered.map((lang) => (
                   <button
@@ -395,13 +403,13 @@ function AuthLanguageSelector() {
                     }}
                     className={`flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-xs transition-colors ${
                       lang.code === selected
-                        ? 'bg-[#0D6E63]/10 text-[#0D6E63]'
-                        : 'text-gray-600 hover:bg-gray-50'
+                        ? 'bg-primary-soft text-primary'
+                        : 'text-ink-2 hover:bg-bg-soft'
                     }`}
                   >
                     <span className="text-sm">{lang.flag}</span>
                     <span className="flex-1 font-medium">{lang.name}</span>
-                    {lang.code === selected && <Check className="size-3.5 text-[#0D6E63]" />}
+                    {lang.code === selected && <Check className="size-3.5 text-primary" />}
                   </button>
                 ))
               )}

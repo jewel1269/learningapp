@@ -1,252 +1,330 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { Caveat } from 'next/font/google';
 import {
-  ArrowRight,
   BookOpen,
+  ChevronsRight,
+  Globe2,
   GraduationCap,
-  MonitorPlay,
-  Users,
+  Lightbulb,
+  Play,
+  Star,
+  X,
 } from 'lucide-react';
+import { Button } from '@/src/components/ui/button';
 import { Container } from './Container';
 
-const avatars = [
-  { src: 'https://i.pravatar.cc/150?img=1', size: 110, top: '170px', left: '150px', delay: 0 },
-  { src: 'https://i.pravatar.cc/150?img=5', size: 95, top: '350px', left: '300px', delay: 0.5 },
-  { src: 'https://i.pravatar.cc/150?img=8', size: 105, bottom: '210px', left: '170px', delay: 1 },
-  { src: 'https://i.pravatar.cc/150?img=12', size: 105, top: '150px', right: '180px', delay: 0.3 },
-  { src: 'https://i.pravatar.cc/150?img=16', size: 95, top: '330px', right: '260px', delay: 0.8 },
-  { src: 'https://i.pravatar.cc/150?img=20', size: 110, bottom: '220px', right: '140px', delay: 1.2 },
-];
+const caveat = Caveat({
+  subsets: ['latin'],
+  weight: ['600', '700'],
+  display: 'swap',
+});
 
-const stats = [
-  { icon: BookOpen, value: '1,090+', label: 'Our Online Courses' },
-  { icon: Users, value: '120+', label: 'Our Instructors' },
-  { icon: MonitorPlay, value: '145+', label: 'Total Video Lessons' },
-  { icon: GraduationCap, value: '6,000+', label: 'Total Students Enrolled' },
-];
+function HeroDecorations() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute -left-32 top-10 size-[420px] rounded-full bg-[#C4B5FD]/25 blur-[90px]" />
+      <div className="absolute -right-24 top-0 size-[480px] rounded-full bg-[#BFDBFE]/35 blur-[100px]" />
+      <div className="absolute bottom-0 left-[35%] size-[320px] rounded-full bg-[#FED7AA]/30 blur-[80px]" />
+
+      <div
+        className="absolute left-[42%] top-[18%] h-[420px] w-[420px] -translate-x-1/2 opacity-[0.35]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, rgba(0,127,142,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,127,142,0.18) 1px, transparent 1px)',
+          backgroundSize: '36px 36px',
+        }}
+      />
+
+      <svg className="absolute left-[4%] top-[14%] size-28 opacity-20" viewBox="0 0 80 80">
+        {[...Array(6)].map((_, row) =>
+          [...Array(6)].map((__, col) => (
+            <circle key={`${row}-${col}`} cx={col * 14 + 6} cy={row * 14 + 6} r="2.5" fill="#007F8E" />
+          )),
+        )}
+      </svg>
+      <svg className="absolute bottom-[12%] right-[6%] size-32 opacity-15" viewBox="0 0 80 80">
+        {[...Array(6)].map((_, row) =>
+          [...Array(6)].map((__, col) => (
+            <circle key={`${row}-${col}`} cx={col * 14 + 6} cy={row * 14 + 6} r="2.5" fill="#007F8E" />
+          )),
+        )}
+      </svg>
+
+      <div className="absolute left-[6%] top-[34%] rotate-[-12deg] text-primary opacity-80">
+        <GraduationCap className="size-14 drop-shadow-sm" strokeWidth={1.5} />
+      </div>
+      <div className="absolute right-[8%] top-[24%] rotate-[8deg] text-[#EC4899] opacity-75">
+        <BookOpen className="size-11" strokeWidth={1.6} />
+      </div>
+      <div className="absolute right-[2%] top-[42%] text-primary/60">
+        <Globe2 className="size-12" strokeWidth={1.4} />
+      </div>
+    </div>
+  );
+}
+
+function HeroVideoButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-label="Play instructor video"
+      onClick={onClick}
+      className="group relative grid size-[70px] place-items-center rounded-full"
+    >
+      <span className="absolute inset-0 rounded-full bg-secondary/10" />
+      <span className="absolute inset-[7px] rounded-full bg-secondary/20" />
+
+      <span className="relative grid size-10 place-items-center">
+        <span
+          aria-hidden
+          className="absolute inset-0 rounded-full bg-secondary/35 animate-hero-video-ripple"
+        />
+        <span
+          aria-hidden
+          className="absolute inset-0 rounded-full bg-secondary/25 animate-hero-video-ripple animate-hero-video-ripple-delay-1"
+        />
+        <span
+          aria-hidden
+          className="absolute inset-0 rounded-full bg-secondary/20 animate-hero-video-ripple animate-hero-video-ripple-delay-2"
+        />
+        <span className="relative z-10 grid size-10 place-items-center rounded-full bg-secondary text-white transition-colors group-hover:bg-secondary-2 animate-hero-video-pulse-core">
+          <Play className="ml-0.5 size-3.5 fill-white" />
+        </span>
+      </span>
+    </button>
+  );
+}
+
+
+
+function HeroCollage() {
+  return (
+    <div className="relative w-full max-w-[560px] lg:ml-[77px]">
+      <div className="relative grid grid-cols-2 gap-x-5">
+        {/* Left column */}
+        <div className="relative z-10">
+          <div className="relative mb-6 aspect-[4/5] overflow-hidden rounded-[24px]">
+            <Image
+              src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=420&h=520&fit=crop&crop=faces"
+              alt="Male student studying with laptop"
+              fill
+              className="object-cover"
+              sizes="(max-width:1024px) 45vw, 260px"
+            />
+          </div>
+
+          <div className="relative rounded-[13px] bg-white p-3.5 shadow-[0_0_20px_rgba(190,190,190,0.38)]">
+            <div className="relative aspect-[16/9] overflow-hidden rounded-[9px]">
+              <Image
+                src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=220&fit=crop"
+                alt="Male student learning UI/UX design on laptop"
+                fill
+                className="object-cover"
+                sizes="260px"
+              />
+              <span className="absolute left-2.5 top-2.5 rounded-[7px] border border-ink bg-[#FFC224] px-1.5 py-1 text-[12px] font-semibold leading-none text-ink">
+                -10% Off
+              </span>
+            </div>
+
+            <div className="relative mt-2 pr-10">
+              <p className="text-[14px] font-medium leading-[17px] text-ink">
+                UI/UX Design Enhancing <br /> User Experience Effectively
+              </p>
+              <p className="mt-5 text-[18px] font-medium leading-none text-secondary">$150.00</p>
+
+              <div className="absolute bottom-0 right-0 text-right">
+                <p className="text-[12px] font-medium leading-none text-ink">
+                  5.50/<span className="text-ink-2">14</span>
+                </p>
+                <div className="mt-0.5 flex justify-end gap-0.5">
+                  {[0, 1, 2].map((i) => (
+                    <Star key={i} className="size-3 fill-[#FFC224] text-[#FFC224]" />
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                aria-label="View course"
+                className="absolute right-0 top-1 flex h-6 w-9 items-center justify-center rounded-full bg-primary text-white transition-colors hover:bg-primary-dark"
+              >
+                <ChevronsRight className="size-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Right column */}
+        <div className="relative z-10 mt-[116px]">
+          <div className="relative mb-6 aspect-[4/5] overflow-hidden rounded-[24px]">
+            <Image
+              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=420&h=520&fit=crop&crop=faces"
+              alt="Male student portrait"
+              fill
+              className="object-cover"
+              sizes="(max-width:1024px) 45vw, 260px"
+            />
+          </div>
+
+          <div className="relative max-w-[225px]">
+            <div
+              aria-hidden
+              className="absolute -bottom-1.5 -right-1.5 top-1.5 left-1.5 -z-10 rounded-[45px] border-2 border-ink"
+            />
+            <div className="flex items-center gap-[15px] rounded-[45px] bg-white px-5 py-[17px] shadow-[0_0_20px_rgba(0,0,0,0.1)]">
+              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#FEF3C7] text-[#F59E0B]">
+                <Lightbulb className="size-5" fill="#FEF3C7" />
+              </span>
+              <div>
+                <p className="flex items-center text-[24px] font-semibold leading-none text-primary">
+                  <span>25</span>
+                  <span>+</span>
+                  <span className="ml-1 text-[16px] capitalize text-ink">Years</span>
+                </p>
+                <p className="text-[16px] font-semibold lowercase leading-[26px] text-ink">of experience</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function Hero() {
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!videoModalOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setVideoModalOpen(false);
+    };
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [videoModalOpen]);
+
   return (
     <section
       id="top"
-      className="relative h-[900px] overflow-hidden bg-white"
+      className="relative overflow-hidden bg-[linear-gradient(282.57deg,#F1E4FF_0.89%,#F0FFF7_54.81%,#FFEBFF_100%)] pb-16 pt-8 lg:pb-20 lg:pt-24"
     >
-      {/* ─── Gradient Background ─── */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-40 -top-40 size-[700px] rounded-full bg-[#D4ECFF] opacity-60 blur-[140px]" />
-        <div className="absolute -right-32 top-10 size-[600px] rounded-full bg-[#FFE4CC] opacity-55 blur-[140px]" />
-        <div className="absolute bottom-20 left-[20%] size-[550px] rounded-full bg-[#FFDDD6] opacity-50 blur-[130px]" />
-        <div className="absolute -right-20 bottom-10 size-[500px] rounded-full bg-[#EDE4FF] opacity-55 blur-[130px]" />
-        <div className="absolute left-[40%] top-[30%] size-[400px] rounded-full bg-[#FFF3D6] opacity-45 blur-[120px]" />
-        <div className="absolute -left-20 bottom-[30%] size-[350px] rounded-full bg-[#D6F0FF] opacity-40 blur-[110px]" />
-      </div>
+      <HeroDecorations />
 
-      {/* ─── Decorations ─── */}
-      <div className="pointer-events-none absolute inset-0">
-        {/* Yellow confetti — top left */}
-        <svg className="absolute left-[12%] top-[18%] size-14 opacity-20" viewBox="0 0 56 56">
-          <circle cx="6" cy="6" r="2.5" fill="#F7C948" />
-          <circle cx="18" cy="6" r="2.5" fill="#F7C948" />
-          <circle cx="30" cy="6" r="2.5" fill="#F7C948" />
-          <circle cx="6" cy="18" r="2.5" fill="#F7C948" />
-          <circle cx="18" cy="18" r="2.5" fill="#F7C948" />
-          <circle cx="30" cy="18" r="2.5" fill="#F7C948" />
-          <circle cx="6" cy="30" r="2.5" fill="#F7C948" />
-          <circle cx="18" cy="30" r="2.5" fill="#F7C948" />
-          <circle cx="30" cy="30" r="2.5" fill="#F7C948" />
-        </svg>
+      <Container className="relative grid items-center gap-10 lg:grid-cols-2 lg:gap-8">
+        {/* Left content */}
+        <div className="relative z-10 max-w-[560px] pb-28 lg:mt-14 lg:pb-0">
+          <p className={`${caveat.className} text-[24px] font-semibold italic leading-[30px] text-primary sm:text-[26px]`}>
+            # Best Online Platform
+          </p>
 
-        {/* Curved yellow lines — bottom left */}
-        <svg className="absolute bottom-[38%] left-[7%] size-16 opacity-15" viewBox="0 0 64 64" fill="none">
-          <path d="M8 48 C20 20, 44 16, 56 28" stroke="#F7C948" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M12 56 C24 30, 48 26, 60 36" stroke="#F7C948" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-
-        {/* Purple dotted blob — top right */}
-        <svg className="absolute right-[8%] top-[14%] size-24 opacity-12" viewBox="0 0 96 96">
-          {[...Array(8)].map((_, row) =>
-            [...Array(8)].map((__, col) => (
-              <circle
-                key={`${row}-${col}`}
-                cx={col * 12 + 6}
-                cy={row * 12 + 6}
-                r={1.5 + ((row + col) % 3)}
-                fill="#7C3AED"
-              />
-            )),
-          )}
-        </svg>
-
-        {/* Yellow circle — right */}
-        <svg className="absolute right-[6%] top-[45%] size-12 opacity-15" viewBox="0 0 48 48">
-          <circle cx="24" cy="24" r="20" fill="none" stroke="#F7C948" strokeWidth="2.5" />
-        </svg>
-
-        {/* Small purple outline — bottom right */}
-        <svg className="absolute bottom-[32%] right-[9%] size-16 opacity-10" viewBox="0 0 64 64">
-          <polygon points="32,4 60,20 52,52 12,52 4,20" fill="none" stroke="#7C3AED" strokeWidth="2" />
-        </svg>
-      </div>
-
-      {/* ─── Floating Avatars ─── */}
-      {avatars.map((a, i) => (
-        <motion.div
-          key={i}
-          className="absolute z-10 hidden overflow-hidden rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.1)] lg:block"
-          style={{
-            width: a.size,
-            height: a.size,
-            top: 'top' in a ? a.top : undefined,
-            bottom: 'bottom' in a ? a.bottom : undefined,
-            left: 'left' in a ? a.left : undefined,
-            right: 'right' in a ? a.right : undefined,
-          }}
-          animate={{ y: [-8, 8] }}
-          transition={{
-            duration: 5 + i * 0.5,
-            repeat: Infinity,
-            repeatType: 'reverse',
-            ease: 'easeInOut',
-            delay: a.delay,
-          }}
-        >
-          <img
-            src={a.src}
-            alt={`Student ${i + 1}`}
-            className="size-full object-cover"
-            loading="lazy"
-          />
-        </motion.div>
-      ))}
-
-      {/* ─── Main Content ─── */}
-      <Container className="relative z-20 pt-[160px] lg:pt-[170px]">
-        <div className="mx-auto max-w-[780px] text-center">
-          {/* Headline */}
-          <motion.h1
-            className="mx-auto max-w-[780px] text-[clamp(2.5rem,5vw,72px)] font-[800] leading-[1.05] tracking-tight text-[#111827]"
-            style={{ fontFamily: 'var(--font-poppins)' }}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-          >
-            Unlock Your Potential with
-            <br />
-            Expert Online{' '}
-            <span className="relative inline-block">
-              <span className="relative z-10">Learning</span>
-              <svg
-                className="absolute -bottom-1 left-0 z-0 h-[18px] w-full"
-                viewBox="0 0 200 20"
-                preserveAspectRatio="none"
-                fill="none"
-              >
-                <path
-                  d="M2 14C30 6 70 2 100 4C130 6 170 10 198 6"
-                  stroke="#F7C948"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  opacity="0.7"
-                />
-              </svg>
+          <h1 className="mt-1 text-[42px] font-semibold leading-[1.15] tracking-[-0.02em] text-ink sm:text-[52px] lg:text-[63px] lg:leading-[80px]">
+            <span className="whitespace-nowrap">
+              Start Learning <span className="text-secondary">Today</span>
             </span>
-          </motion.h1>
+            <br />
+            <span className="text-secondary">Discover</span> Your Next
+            <br />
+            Great Skill
+          </h1>
 
-          {/* Description */}
-          <motion.p
-            className="mx-auto mt-7 max-w-[780px] text-[18px] leading-[1.8] text-[#6B7280]"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            Join Educeet to explore high-quality online courses, gain real-world
-            skills, and achieve your goals with guidance from expert
-            instructors—anytime, anywhere, at your pace.
-          </motion.p>
+          <p className="mt-5 max-w-[480px] text-[17px] leading-[30px] text-ink-2 lg:text-[20px]">
+            Enhance your educational journey with our cutting-edge course platform.
+          </p>
 
-          {/* Buttons */}
-          <motion.div
-            className="mt-10 flex flex-wrap items-center justify-center gap-5"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.45 }}
-          >
-            <Link
-              href="/courses"
-              className="group inline-flex h-[50px] items-center gap-2.5 rounded-xl bg-[#0D6E63] px-[34px] text-[16px] font-semibold text-white shadow-[0_4px_14px_rgba(13,110,99,0.35)] transition-all duration-300 hover:-translate-y-[3px] hover:bg-[#095c52] hover:shadow-[0_8px_25px_rgba(13,110,99,0.45)]"
-              style={{ fontFamily: 'var(--font-poppins)' }}
-            >
-              Find Courses
-              <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
+          <div className="mt-8 flex flex-wrap items-center gap-6">
             <Link
               href="/signup"
-              className="inline-flex h-[50px] items-center gap-2.5 rounded-xl border border-[#0D6E63] bg-transparent px-[34px] text-[16px] font-semibold text-[#0D6E63] transition-all duration-300 hover:bg-[#F8FAFA]"
-              style={{ fontFamily: 'var(--font-poppins)' }}
+              className="inline-flex h-[58px] items-center rounded-full bg-primary pl-8 pr-2 text-[16px] font-semibold text-white shadow-[var(--shadow-primary)] transition-all hover:bg-primary-dark"
             >
-              Apply Now
-              <ArrowRight className="size-5" />
+              Get Started
+              <span className="ml-5 grid size-11 place-items-center rounded-full bg-primary-dark">
+                <ChevronsRight className="size-5" strokeWidth={2.5} />
+              </span>
             </Link>
-          </motion.div>
-        </div>
-      </Container>
 
-      {/* ─── Bottom Stats Card ─── */}
-      <motion.div
-        className="absolute bottom-0 left-1/2 z-30 w-full -translate-x-1/2 px-6 pb-0"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.6 }}
-      >
-        <div className="mx-auto max-w-[1200px]">
-          {/* Green card with curved top */}
-          <div className="rounded-t-[70px] rounded-b-[28px] bg-[#0C665B] px-14 py-8 shadow-[0_-4px_30px_rgba(12,102,91,0.25)] ring-1 ring-[#F6C23E]/20">
-            <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
-              {stats.map((s) => (
-                <div key={s.label} className="flex items-center gap-2">
-                  <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl border border-[#F6C23E]/30 bg-[#F6C23E]/10">
-                    <s.icon className="size-7 text-[#F6C23E]" />
-                  </div>
-                  <div>
-                    <div
-                      className="text-[16px] font-semibold leading-none text-white md:text-[22px]"
-                      style={{ fontFamily: 'var(--font-poppins)' }}
-                    >
-                      {s.value}
-                    </div>
-                    <div
-                      className="mt-2 text-[12px] font-semibold text-[#E8F4F2] md:text-[16px]"
-                      style={{ fontFamily: 'var(--font-poppins)' }}
-                    >
-                      {s.label}
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center gap-4">
+              <div className="flex -space-x-3">
+                {[11, 12, 13].map((img) => (
+                  <Image
+                    key={img}
+                    src={`https://i.pravatar.cc/80?img=${img}`}
+                    alt=""
+                    width={40}
+                    height={40}
+                    className="size-10 rounded-full border border-line object-cover"
+                  />
+                ))}
+              </div>
+              <div className="leading-tight">
+                <p className="text-[22px] font-bold text-primary">2000+</p>
+                <p className="text-[13px] text-ink-2">Success Student</p>
+              </div>
             </div>
           </div>
-          {/* Thin yellow bottom border */}
-          <div className="mx-auto h-[3px] w-full rounded-b-full bg-gradient-to-r from-transparent via-[#F6C23E] to-transparent opacity-60" />
-        </div>
-      </motion.div>
 
-      {/* ─── Bottom White Wave Curve ─── */}
-      <div className="absolute bottom-[-1px] left-0 right-0 z-20">
-        <svg
-          className="w-full"
-          viewBox="0 0 1440 80"
-          preserveAspectRatio="none"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0 80V30C200 0 500 0 720 20C940 40 1200 60 1440 30V80H0Z"
-            fill="white"
+          <div className="absolute bottom-[105px] -right-[50px] z-30 hidden lg:block">
+            <HeroVideoButton onClick={() => setVideoModalOpen(true)} />
+          </div>
+        </div>
+
+        <HeroCollage />
+      </Container>
+
+      {videoModalOpen ? (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Close video modal"
+            className="absolute inset-0 bg-ink/45 backdrop-blur-[2px]"
+            onClick={() => setVideoModalOpen(false)}
           />
-        </svg>
-      </div>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="hero-video-modal-title"
+            className="relative w-full max-w-[420px] rounded-[24px] bg-white p-8 text-center shadow-[var(--shadow-elevated)]"
+          >
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={() => setVideoModalOpen(false)}
+              className="absolute right-4 top-4 grid size-9 place-items-center rounded-full text-ink-2 transition-colors hover:bg-bg-soft hover:text-ink"
+            >
+              <X className="size-5" />
+            </button>
+
+            <span className="mx-auto grid size-16 place-items-center rounded-full bg-secondary text-white shadow-[var(--shadow-accent)]">
+              <Play className="ml-1 size-7 fill-white" />
+            </span>
+
+            <h2 id="hero-video-modal-title" className="mt-5 text-[22px] font-bold text-ink">
+              Instructional Preview Video Coming Soon
+            </h2>
+            <p className="mt-2 text-[15px] leading-relaxed text-ink-2">
+              We are preparing the instructional preview video. Please check back shortly.
+            </p>
+
+            <Button
+              type="button"
+              className="mt-6 w-full rounded-full"
+              onClick={() => setVideoModalOpen(false)}
+            >
+              Got it
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
