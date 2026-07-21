@@ -12,7 +12,7 @@ function FooterLogo() {
   return (
     <Link href="#top" className="relative inline-flex flex-col leading-none" aria-label="FiStudy Home">
       <span className="text-[34px] font-bold tracking-[-0.02em]">
-        <span className="text-primary">Fi</span>
+        <span className="text-primary">AI</span>
         <span className="text-ink">Study</span>
       </span>
       <svg
