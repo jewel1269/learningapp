@@ -8,7 +8,11 @@ const envSchema = z
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 
     MONGO_URI: z.string().min(1).default('mongodb://localhost:27017/b2c'),
-    REDIS_URL: z.string().min(1).default('redis://localhost:6379'),
+    REDIS_URL: z.string().default('redis://localhost:6379'),
+    REDIS_ENABLED: z
+      .string()
+      .default('true')
+      .transform((value) => !['false', '0', 'off', 'no'].includes(value.toLowerCase())),
     CORS_ORIGIN: z.string().min(1).default('http://localhost:3000'),
 
     JWT_ACCESS_SECRET: z.string().default(''),
@@ -73,6 +77,7 @@ export const env = {
   logLevel: data.LOG_LEVEL,
   mongoUri: data.MONGO_URI,
   redisUrl: data.REDIS_URL,
+  redisEnabled: data.REDIS_ENABLED,
   corsOrigin: data.CORS_ORIGIN,
   // In prod these are guaranteed non-empty by superRefine; in dev/test fall back to a dev secret.
   jwtAccessSecret: data.JWT_ACCESS_SECRET || (isProd ? '' : 'dev-access-secret'),

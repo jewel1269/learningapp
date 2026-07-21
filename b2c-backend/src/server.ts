@@ -38,19 +38,24 @@ async function bootstrap(): Promise<void> {
   await connectDB();
   await ensureIndexes();
   await seedAchievements();
-  await redis.connect();
-  logger.info('Redis connected');
 
-  startCourseGenerationWorker();
-  startGradingWorker();
-  startStreakResetWorker();
-  await scheduleStreakReset();
-  startDailyReminderWorker();
-  await scheduleDailyReminders();
-  startAccountPurgeWorker();
-  await scheduleAccountPurge();
-  startSubscriptionSyncWorker();
-  await scheduleSubscriptionSync();
+  if (env.redisEnabled) {
+    await redis.connect();
+    logger.info('Redis connected');
+
+    startCourseGenerationWorker();
+    startGradingWorker();
+    startStreakResetWorker();
+    await scheduleStreakReset();
+    startDailyReminderWorker();
+    await scheduleDailyReminders();
+    startAccountPurgeWorker();
+    await scheduleAccountPurge();
+    startSubscriptionSyncWorker();
+    await scheduleSubscriptionSync();
+  } else {
+    logger.warn('REDIS_ENABLED=false — background jobs and rate limiting are disabled');
+  }
 
   const server = createServer(app);
   server.listen(env.port, () => logger.info(`b2c-backend listening on :${env.port}`));
@@ -79,7 +84,7 @@ async function bootstrap(): Promise<void> {
     );
     await closeQueues().catch((err) => logger.error({ err }, 'Error closing queues'));
     await disconnectDB().catch((err) => logger.error({ err }, 'Error disconnecting Mongo'));
-    redis.disconnect();
+    if (env.redisEnabled) redis.disconnect();
     process.exit(0);
   };
 

@@ -1,5 +1,7 @@
-import { Queue, type RedisOptions } from 'bullmq';
-import { env } from '../config/env';
+import { Queue } from 'bullmq';
+import { redisConnectionOptions } from '../config/redis';
+
+export { redisConnectionOptions };
 
 // Async queues (§8). Workers are added per phase (course gen §3, grading §6).
 export const QUEUE_NAMES = {
@@ -10,19 +12,6 @@ export const QUEUE_NAMES = {
   accountPurge: 'account-purge',
   subscriptionSync: 'subscription-sync',
 } as const;
-
-// Plain connection options — BullMQ manages its own dedicated connection (recommended,
-// and avoids the dual-ioredis type clash with the app-level client).
-export function redisConnectionOptions(): RedisOptions {
-  const url = new URL(env.redisUrl);
-  return {
-    host: url.hostname,
-    port: url.port ? Number(url.port) : 6379,
-    username: url.username || undefined,
-    password: url.password || undefined,
-    maxRetriesPerRequest: null,
-  };
-}
 
 // Queues are created lazily so merely importing this module opens no Redis
 // connection — only an actual enqueue (or worker) does.

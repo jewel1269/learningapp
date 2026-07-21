@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import { pinoHttp } from 'pino-http';
 
 import { env } from './config/env';
-import { redis } from './config/redis';
+import { pingRedis } from './config/redis';
 import { logger } from './common/utils/logger';
 import { errorMiddleware } from './middlewares/error.middleware';
 import { notFoundMiddleware } from './middlewares/notFound.middleware';
@@ -64,16 +64,15 @@ app.get('/health', (_req, res) => {
 // Readiness — external dependencies are reachable.
 app.get('/health/ready', async (_req, res) => {
   const dbUp = mongoose.connection.readyState === 1;
-  let redisUp = false;
-  try {
-    redisUp = (await redis.ping()) === 'PONG';
-  } catch {
-    redisUp = false;
-  }
+  const redisUp = await pingRedis();
   const ready = dbUp && redisUp;
   res
     .status(ready ? 200 : 503)
-    .json({ status: ready ? 'ready' : 'not_ready', db: dbUp, redis: redisUp });
+    .json({
+      status: ready ? 'ready' : 'not_ready',
+      db: dbUp,
+      redis: env.redisEnabled ? redisUp : 'disabled',
+    });
 });
 
 app.use('/auth', authRoutes);

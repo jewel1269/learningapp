@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
+import { env } from '../config/env';
 import { redis } from '../config/redis';
 
 interface RateLimitOptions {
@@ -16,6 +17,10 @@ function setHeaders(res: Response, max: number, count: number): void {
 export const rateLimit =
   ({ windowMs, max, keyPrefix }: RateLimitOptions) =>
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!env.redisEnabled) {
+      next();
+      return;
+    }
     try {
       const key = `rl:${keyPrefix}:${req.ip ?? 'unknown'}`;
       const count = await redis.incr(key);
@@ -43,6 +48,10 @@ interface UserRateLimitOptions {
 export const userRateLimit =
   ({ windowMs, free, premium, keyPrefix }: UserRateLimitOptions) =>
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!env.redisEnabled) {
+      next();
+      return;
+    }
     try {
       const id = req.user?.id ?? req.ip ?? 'unknown';
       const max = req.user?.tier === 'premium' ? premium : free;
