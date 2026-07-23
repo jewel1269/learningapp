@@ -64,11 +64,14 @@ export function ProfileDropdown() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2 transition-colors hover:bg-[#F8F9FB]"
+        className="flex items-center gap-2.5 rounded-xl py-1 pl-1 pr-2 transition-colors hover:bg-bg-soft"
         aria-expanded={open}
         aria-haspopup="true"
       >
-        <Avatar name={user?.email} className="size-10" />
+        <Avatar name={user?.email} className="size-9" />
+        <span className="hidden max-w-[120px] truncate text-sm font-medium text-ink sm:block">
+          {user?.email?.split('@')[0]?.split(/[._-]/)[0] ?? 'User'}
+        </span>
       </button>
 
       <AnimatePresence>

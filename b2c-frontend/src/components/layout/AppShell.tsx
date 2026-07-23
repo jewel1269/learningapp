@@ -2,7 +2,6 @@
 
 import { Sidebar, useSidebar } from './Sidebar';
 import { AdminTopbar } from './AdminTopbar';
-import { FloatingActionButton } from '@/src/components/dashboard/FloatingActionButton';
 import { cn } from '@/src/lib/utils';
 
 // Lives inside <SidebarProvider>, so it can read `collapsed` and shift the main
@@ -11,7 +10,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { collapsed } = useSidebar();
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC]">
+    <div className="flex min-h-screen bg-bg">
       <Sidebar />
       <div
         className={cn(
@@ -22,7 +21,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <AdminTopbar />
         <main className="flex-1 overflow-x-hidden">{children}</main>
       </div>
-      <FloatingActionButton />
     </div>
   );
 }

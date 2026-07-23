@@ -16,6 +16,9 @@ import {
   LogOut,
   Shield,
   BarChart3,
+  Sparkles,
+  LayoutGrid,
+  Crown,
 } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { useLogout, useMe } from "@/src/features/auth";
@@ -40,8 +43,6 @@ const SidebarContext = createContext<SidebarContextType>({
 
 export const useSidebar = () => useContext(SidebarContext);
 
-// Owns sidebar state and provides it to the WHOLE app shell (sidebar + topbar +
-// main), so the hamburger in the topbar and the content padding stay in sync.
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -61,7 +62,6 @@ interface NavItem {
   labelKey: MessageKey;
   href: string;
   icon: React.ElementType;
-  badge?: number;
 }
 
 interface NavGroup {
@@ -71,32 +71,34 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   {
-    title: "MENU",
+    title: "CLIENT APP",
     items: [
       { labelKey: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
       { labelKey: "nav.courses", href: "/my-courses", icon: BookOpen },
-      { labelKey: "nav.quizzes", href: "/quizzes", icon: ClipboardList },
-      { labelKey: "nav.exams", href: "/exams", icon: GraduationCap },
       { labelKey: "nav.assessments", href: "/assessments", icon: FolderOpen },
       { labelKey: "nav.achievements", href: "/achievements", icon: Award },
     ],
   },
   {
-    title: "APPS",
+    title: "LEARNING",
     items: [
-      { labelKey: "nav.notifications", href: "/notifications", icon: Bell, badge: 3 },
+      { labelKey: "nav.quizzes", href: "/quizzes", icon: ClipboardList },
+      { labelKey: "nav.exams", href: "/exams", icon: GraduationCap },
+      { labelKey: "common.newCourse", href: "/create-course", icon: Sparkles },
     ],
   },
   {
-    title: "PAGES",
+    title: "ACCOUNT",
     items: [
       { labelKey: "nav.settings", href: "/settings", icon: Settings },
+      { labelKey: "nav.upgrade", href: "/upgrade", icon: Crown },
+      { labelKey: "nav.notifications", href: "/notifications", icon: Bell },
     ],
   },
 ];
 
 const adminGroup: NavGroup = {
-  title: "ADMIN",
+  title: "ADMIN PANEL",
   items: [
     { labelKey: "nav.adminMetrics", href: "/admin/metrics", icon: BarChart3 },
     { labelKey: "nav.adminContent", href: "/admin/content", icon: Shield },
@@ -119,31 +121,14 @@ function SidebarNavItem({
       href={item.href}
       title={collapsed ? label : undefined}
       className={cn(
-        "group relative flex h-12 items-center rounded-xl text-[15px] font-medium transition-all duration-200",
-        collapsed ? "justify-center px-0" : "gap-4 px-6",
+        "flex items-center rounded-xl text-[15px] font-medium transition-colors duration-200",
+        collapsed ? "justify-center px-0 py-3" : "gap-3 px-4 py-2.5",
         active
-          ? "bg-primary/[0.08] text-primary"
-          : "text-ink-2 hover:bg-[#F8F9FB] hover:text-ink",
+          ? "bg-primary-soft text-primary"
+          : "text-ink-2 hover:bg-bg-soft hover:text-ink",
       )}
     >
-      {/* Active left indicator */}
-      {active && (
-        <motion.div
-          layoutId="sidebar-active-indicator"
-          className="absolute left-0 top-2 bottom-2 w-[3px] rounded-full bg-primary"
-          transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-        />
-      )}
-
-      {/* Icon */}
-      <item.icon
-        className={cn(
-          "size-5 shrink-0 transition-colors duration-200",
-          active ? "text-primary" : "text-ink-3 group-hover:text-ink-2",
-        )}
-      />
-
-      {/* Label */}
+      <item.icon className="size-[18px] shrink-0 stroke-[1.75]" />
       {!collapsed && <span className="flex-1 truncate">{label}</span>}
     </Link>
   );
@@ -154,23 +139,15 @@ function SidebarGroupSection({ group, collapsed }: { group: NavGroup; collapsed:
   const { t } = useTranslation();
 
   return (
-    <div className={collapsed ? "px-2" : "px-4"}>
-      {/* Section label */}
-      {collapsed ? (
-        <div className="py-3" />
-      ) : (
-        <div className="flex items-center px-3 py-3">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3/70">
-            {group.title}
-          </span>
-        </div>
+    <div className={collapsed ? "px-2" : "px-5"}>
+      {!collapsed && (
+        <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3">
+          {group.title}
+        </p>
       )}
-
-      {/* Items */}
       <div className="flex flex-col gap-0.5">
         {group.items.map((item) => {
-          const active =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
             <SidebarNavItem
               key={item.href}
@@ -186,60 +163,75 @@ function SidebarGroupSection({ group, collapsed }: { group: NavGroup; collapsed:
   );
 }
 
+function BrandLogo({ collapsed }: { collapsed: boolean }) {
+  return (
+    <Link href="/dashboard" className="flex items-center gap-3">
+      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-2 shadow-[var(--shadow-primary)]">
+        <GraduationCap className="size-5 text-primary-ink" strokeWidth={2} />
+      </span>
+      {!collapsed && (
+        <span className="text-[22px] font-bold tracking-tight">
+          <span className="text-primary">AI</span>
+          <span className="text-ink">Study</span>
+        </span>
+      )}
+    </Link>
+  );
+}
+
 export function Sidebar() {
   const { collapsed, mobileOpen, closeMobile } = useSidebar();
   const logout = useLogout();
   const meQ = useMe();
   const { t } = useTranslation();
-  const isAdmin = meQ.data?.user.role === 'admin';
+  const isAdmin = meQ.data?.user.role === "admin";
   const groups = isAdmin ? [...navGroups, adminGroup] : navGroups;
 
-  // `isCollapsed` is only ever true for the desktop rail — the mobile drawer
-  // always renders the full-width version.
   const renderContent = (isCollapsed: boolean) => (
-    <div className="flex h-full flex-col">
-      {/* Logo */}
-      <div
-        className={cn(
-          "flex items-center py-5",
-          isCollapsed ? "justify-center px-0" : "gap-3 px-6",
-        )}
-      >
-        <Link href="/dashboard" className="flex items-center gap-3">
-          {isCollapsed ? (
-            <span className="grid size-9 place-items-center rounded-xl bg-primary text-sm font-bold text-primary-ink">
-              B
-            </span>
-          ) : (
-            <span className="text-xl font-bold tracking-tight text-ink">Bina B2C</span>
-          )}
-        </Link>
+    <div className="flex h-full flex-col bg-bg-elev">
+      <div className={cn("border-b border-line py-5", isCollapsed ? "px-3" : "px-5")}>
+        <BrandLogo collapsed={isCollapsed} />
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto pb-6">
-        <div className="flex flex-col gap-1">
-          {groups.map((group, i) => (
-            <div key={group.title}>
-              <SidebarGroupSection group={group} collapsed={isCollapsed} />
-              {i < groups.length - 1 && <div className="mx-6 my-2 h-px bg-line" />}
-            </div>
+      <nav className="flex-1 overflow-y-auto py-4">
+        <div className="flex flex-col gap-5">
+          {groups.map((group) => (
+            <SidebarGroupSection key={group.title} group={group} collapsed={isCollapsed} />
           ))}
         </div>
       </nav>
 
-      {/* Bottom logout */}
-      <div className="border-t border-line px-4 py-3">
+      {!isCollapsed && (
+        <div className="space-y-4 border-t border-line px-5 py-5">
+          <Link
+            href="/upgrade"
+            className="flex h-11 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-primary-ink shadow-[var(--shadow-primary)] transition hover:bg-primary-dark"
+          >
+            Purchase now
+          </Link>
+
+          <div className="overflow-hidden rounded-xl bg-gradient-to-br from-primary via-primary-2 to-secondary p-4 text-center text-primary-ink shadow-[var(--shadow-glass)]">
+            <span className="mx-auto grid size-10 place-items-center rounded-lg bg-white/15">
+              <LayoutGrid className="size-5" />
+            </span>
+            <p className="mt-3 text-xs leading-5 text-white/90">
+              Build your personalized AI learning path today
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="border-t border-line px-3 py-3">
         <button
           onClick={logout}
           title={isCollapsed ? "Logout" : undefined}
           className={cn(
-            "flex h-12 w-full items-center rounded-xl text-[15px] font-medium text-ink-2 transition-all duration-200 hover:bg-[#FEF2F2] hover:text-[#EF4444]",
-            isCollapsed ? "justify-center px-0" : "gap-4 px-6",
+            "flex w-full items-center rounded-xl text-[15px] font-medium text-ink-2 transition hover:bg-bg-soft hover:text-ink",
+            isCollapsed ? "justify-center py-3" : "gap-3 px-4 py-2.5",
           )}
         >
-          <LogOut className="size-5 shrink-0" />
-          {!isCollapsed && <span>{t('nav.logout')}</span>}
+          <LogOut className="size-[18px] shrink-0" />
+          {!isCollapsed && <span>{t("nav.logout")}</span>}
         </button>
       </div>
     </div>
@@ -247,7 +239,6 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile overlay */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -260,7 +251,6 @@ export function Sidebar() {
         )}
       </AnimatePresence>
 
-      {/* Mobile sidebar */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.aside
@@ -268,17 +258,16 @@ export function Sidebar() {
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ type: "spring", damping: 28, stiffness: 220 }}
-            className="fixed inset-y-0 left-0 z-50 flex w-[270px] flex-col border-r border-[#F1F5F9] bg-white lg:hidden"
+            className="fixed inset-y-0 left-0 z-50 flex w-[270px] flex-col border-r border-line lg:hidden"
           >
             {renderContent(false)}
           </motion.aside>
         )}
       </AnimatePresence>
 
-      {/* Desktop sidebar — collapses to a 72px icon rail */}
       <aside
         className={cn(
-          "sidebar-transition fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-[#F1F5F9] bg-white transition-[width] duration-300 lg:flex",
+          "fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-line transition-[width] duration-300 lg:flex",
           collapsed ? "w-[72px]" : "w-[270px]",
         )}
       >
