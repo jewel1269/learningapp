@@ -11,6 +11,7 @@ import {
   Menu,
 } from 'lucide-react';
 import { useTheme } from '@/src/providers';
+import { useTranslation } from '@/src/i18n';
 import { useSidebar } from './Sidebar';
 import { LanguageSelector } from './LanguageSelector';
 import { ProfileDropdown } from './ProfileDropdown';
@@ -18,8 +19,10 @@ import { cn } from '@/src/lib/utils';
 
 const routeTitleMap: Record<string, string> = {
   '/dashboard': 'Dashboard',
-  '/courses': 'Courses',
-  '/categories': 'Categories',
+  '/my-courses': 'My Courses',
+  '/quizzes': 'Quizzes',
+  '/exams': 'Exams',
+  '/assessments': 'Assessments',
   '/students': 'Students',
   '/instructors': 'Instructors',
   '/enrollments': 'Enrollments',
@@ -70,6 +73,7 @@ function getPageTitle(pathname: string): string {
 
 export function AdminTopbar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
   const { openMobile, toggle: toggleSidebar } = useSidebar();
   const { theme, toggle } = useTheme();
   const [searchFocused, setSearchFocused] = useState(false);
@@ -115,7 +119,7 @@ export function AdminTopbar() {
               <Search className="absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-ink-3" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder={t('common.search')}
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 onFocus={() => setSearchFocused(true)}

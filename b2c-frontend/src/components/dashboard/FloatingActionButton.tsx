@@ -15,7 +15,7 @@ const actions = [
   { icon: BookOpen, label: 'Create Course', color: '#4F46E5', href: '/create-course' },
   { icon: UserPlus, label: 'Add Student', color: '#7C3AED', href: '/students' },
   { icon: Bell, label: 'Send Notification', color: '#06B6D4', href: '/notifications' },
-  { icon: Upload, label: 'Upload Video', color: '#22C55E', href: '/courses' },
+  { icon: Upload, label: 'Upload Video', color: '#22C55E', href: '/my-courses' },
 ];
 
 export function FloatingActionButton() {

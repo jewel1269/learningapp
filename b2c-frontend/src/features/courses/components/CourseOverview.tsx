@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, BookOpen, GraduationCap, Loader2, Network, X } from 'lucide-react';
 import { useCourse, useCourseStructure } from '@/src/features/courses';
 import { useGenerateExam } from '@/src/features/assessments';
+import { resolveLabForDomain } from '@/src/features/labs';
 import { Badge } from '@/src/components/ui/badge';
 import { Button } from '@/src/components/ui/button';
 import { Progress } from '@/src/components/ui/progress';
@@ -141,7 +142,9 @@ export function CourseOverview({ courseId }: { courseId: string }) {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {modules.map((m, i) => (
+          {modules.map((m, i) => {
+            const lab = resolveLabForDomain(m.domain);
+            return (
             <div key={m.id} className="rounded-2xl border border-line bg-bg-elev p-5 shadow-soft">
               <div className="flex items-center gap-3">
                 <span className="grid size-9 flex-none place-items-center rounded-lg bg-primary-soft font-mono text-sm font-bold text-primary">
@@ -149,9 +152,12 @@ export function CourseOverview({ courseId }: { courseId: string }) {
                 </span>
                 <div className="flex-1">
                   <h3 className="font-semibold">{m.title}</h3>
-                  <p className="text-xs capitalize text-ink-3">
-                    {m.domain} · {m.lessonCount} lessons
-                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <Badge variant="default">{lab.label}</Badge>
+                    <p className="text-xs capitalize text-ink-3">
+                      {m.domain} · {m.lessonCount} lessons
+                    </p>
+                  </div>
                 </div>
                 <Button
                   variant="ghost"
@@ -182,7 +188,8 @@ export function CourseOverview({ courseId }: { courseId: string }) {
                 ))}
               </ul>
             </div>
-          ))}
+            );
+          })}
           {modules.length === 0 && (
             <p className="text-sm text-ink-2">No modules found for this course.</p>
           )}
@@ -199,7 +206,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 function BackLink() {
   return (
     <Link
-      href="/courses"
+      href="/my-courses"
       className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-primary"
     >
       <ArrowLeft className="size-4" /> All courses

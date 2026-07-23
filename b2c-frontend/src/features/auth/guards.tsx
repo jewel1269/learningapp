@@ -36,6 +36,25 @@ export function RequireAuth({
   return <>{children}</>;
 }
 
+// Admin-only routes. Non-admins are sent back to the learner dashboard.
+export function RequireAdmin({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const hydrated = useAuthHydrated();
+  const token = useAuthStore((s) => s.accessToken);
+  const user = useAuthStore((s) => s.user);
+
+  useEffect(() => {
+    if (hydrated && token && user && user.role !== 'admin') {
+      router.replace('/dashboard');
+    }
+  }, [hydrated, token, user, router]);
+
+  if (!hydrated) return <FullScreen />;
+  if (!token || !user) return null;
+  if (user.role !== 'admin') return null;
+  return <>{children}</>;
+}
+
 // For /login and /signup: send users who ARRIVE already-authenticated to the
 // dashboard. The check runs once (in an effect, after hydration) so it does NOT
 // fire mid-flow — otherwise the token appearing during signup would hijack the

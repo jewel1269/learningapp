@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { ApiError } from '@/src/infrastructure/apiClient';
 import { useGenerateQuiz, useQuiz, useSubmitQuiz } from '../useAssessments';
 import { AssessmentView } from './AssessmentView';
 import { AssessmentShell, AssessmentError, AssessmentLoading } from './shell';
@@ -24,7 +25,13 @@ export function QuizRunner({ quizId, lessonId }: { quizId: string; lessonId: str
         questions={quizQ.data.questions}
         submission={submitMut.data ?? null}
         submitting={submitMut.isPending}
-        submitError={submitMut.isError}
+        submitError={
+          submitMut.isError
+            ? submitMut.error instanceof ApiError
+              ? submitMut.error.message
+              : 'Could not submit your answers. Please try again.'
+            : null
+        }
         onSubmit={(answers) => submitMut.mutate(answers)}
         backHref={backHref}
         backLabel="Back to lesson"

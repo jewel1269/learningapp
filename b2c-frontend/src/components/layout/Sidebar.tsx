@@ -11,15 +11,16 @@ import {
   GraduationCap,
   ClipboardList,
   Award,
-  Star,
   Bell,
-  BarChart3,
   Settings,
   LogOut,
-  User,
+  Shield,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/src/lib/utils";
-import { useLogout } from "@/src/features/auth";
+import { useLogout, useMe } from "@/src/features/auth";
+import { useTranslation } from "@/src/i18n";
+import type { MessageKey } from "@/src/i18n";
 
 interface SidebarContextType {
   collapsed: boolean;
@@ -57,7 +58,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 }
 
 interface NavItem {
-  label: string;
+  labelKey: MessageKey;
   href: string;
   icon: React.ElementType;
   badge?: number;
@@ -72,44 +73,51 @@ const navGroups: NavGroup[] = [
   {
     title: "MENU",
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { label: "Courses", href: "/courses", icon: BookOpen, badge: 24 },
-      { label: "Categories", href: "/categories", icon: FolderOpen },
-      { label: "Instructors", href: "/instructors", icon: GraduationCap },
-      { label: "Enrollments", href: "/enrollments", icon: ClipboardList },
-      { label: "Certificates", href: "/certificates", icon: Award },
-      { label: "Reviews", href: "/reviews", icon: Star, badge: 42 },
+      { labelKey: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { labelKey: "nav.courses", href: "/my-courses", icon: BookOpen },
+      { labelKey: "nav.quizzes", href: "/quizzes", icon: ClipboardList },
+      { labelKey: "nav.exams", href: "/exams", icon: GraduationCap },
+      { labelKey: "nav.assessments", href: "/assessments", icon: FolderOpen },
+      { labelKey: "nav.achievements", href: "/achievements", icon: Award },
     ],
   },
   {
     title: "APPS",
     items: [
-      { label: "Notifications", href: "/notifications", icon: Bell, badge: 3 },
-      { label: "Analytics", href: "/analytics", icon: BarChart3 },
+      { labelKey: "nav.notifications", href: "/notifications", icon: Bell, badge: 3 },
     ],
   },
   {
     title: "PAGES",
     items: [
-      { label: "Settings", href: "/settings", icon: Settings },
-      { label: "Profile", href: "/profile", icon: User },
+      { labelKey: "nav.settings", href: "/settings", icon: Settings },
     ],
   },
 ];
+
+const adminGroup: NavGroup = {
+  title: "ADMIN",
+  items: [
+    { labelKey: "nav.adminMetrics", href: "/admin/metrics", icon: BarChart3 },
+    { labelKey: "nav.adminContent", href: "/admin/content", icon: Shield },
+  ],
+};
 
 function SidebarNavItem({
   item,
   active,
   collapsed,
+  label,
 }: {
   item: NavItem;
   active: boolean;
   collapsed: boolean;
+  label: string;
 }) {
   return (
     <Link
       href={item.href}
-      title={collapsed ? item.label : undefined}
+      title={collapsed ? label : undefined}
       className={cn(
         "group relative flex h-12 items-center rounded-xl text-[15px] font-medium transition-all duration-200",
         collapsed ? "justify-center px-0" : "gap-4 px-6",
@@ -136,13 +144,14 @@ function SidebarNavItem({
       />
 
       {/* Label */}
-      {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
+      {!collapsed && <span className="flex-1 truncate">{label}</span>}
     </Link>
   );
 }
 
 function SidebarGroupSection({ group, collapsed }: { group: NavGroup; collapsed: boolean }) {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   return (
     <div className={collapsed ? "px-2" : "px-4"}>
@@ -163,7 +172,13 @@ function SidebarGroupSection({ group, collapsed }: { group: NavGroup; collapsed:
           const active =
             pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
-            <SidebarNavItem key={item.href} item={item} active={active} collapsed={collapsed} />
+            <SidebarNavItem
+              key={item.href}
+              item={item}
+              active={active}
+              collapsed={collapsed}
+              label={t(item.labelKey)}
+            />
           );
         })}
       </div>
@@ -174,6 +189,10 @@ function SidebarGroupSection({ group, collapsed }: { group: NavGroup; collapsed:
 export function Sidebar() {
   const { collapsed, mobileOpen, closeMobile } = useSidebar();
   const logout = useLogout();
+  const meQ = useMe();
+  const { t } = useTranslation();
+  const isAdmin = meQ.data?.user.role === 'admin';
+  const groups = isAdmin ? [...navGroups, adminGroup] : navGroups;
 
   // `isCollapsed` is only ever true for the desktop rail — the mobile drawer
   // always renders the full-width version.
@@ -200,10 +219,10 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto pb-6">
         <div className="flex flex-col gap-1">
-          {navGroups.map((group, i) => (
+          {groups.map((group, i) => (
             <div key={group.title}>
               <SidebarGroupSection group={group} collapsed={isCollapsed} />
-              {i < navGroups.length - 1 && <div className="mx-6 my-2 h-px bg-line" />}
+              {i < groups.length - 1 && <div className="mx-6 my-2 h-px bg-line" />}
             </div>
           ))}
         </div>
@@ -220,7 +239,7 @@ export function Sidebar() {
           )}
         >
           <LogOut className="size-5 shrink-0" />
-          {!isCollapsed && <span>Logout</span>}
+          {!isCollapsed && <span>{t('nav.logout')}</span>}
         </button>
       </div>
     </div>

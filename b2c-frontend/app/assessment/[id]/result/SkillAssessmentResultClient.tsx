@@ -7,6 +7,12 @@ import { Container } from '@/src/components/marketing/Container';
 import { SkillAssessmentResultView } from '@/src/features/skill-assessment/SkillAssessmentResultView';
 import { AssessmentResultSkeleton } from '@/src/features/skill-assessment/SkillAssessmentSkeletons';
 import {
+  buildLearningPathPrefill,
+  readLearningGoal,
+  saveLearningPathPrefill,
+  type LearningPathPrefill,
+} from '@/src/features/learning-path/learningPathRecommendation';
+import {
   pendingAnswersKey,
 } from '@/src/features/skill-assessment/skillAssessmentApi';
 import {
@@ -58,6 +64,21 @@ function ResultContent({ id }: { id: string }) {
     return map;
   }, [submission]);
 
+  const [prefill, setPrefill] = useState<LearningPathPrefill | null>(null);
+
+  useEffect(() => {
+    if (!assessment || !submission) return;
+    const next = buildLearningPathPrefill({
+      assessmentId: id,
+      topic: assessment.topic,
+      customTopic: assessment.customTopic,
+      skillLevel: submission.level,
+      goal: readLearningGoal(),
+    });
+    saveLearningPathPrefill(next);
+    setPrefill(next);
+  }, [assessment, submission, id]);
+
   if (loadingAssessment || loadingResult || submit.isPending) {
     return <AssessmentResultSkeleton />;
   }
@@ -88,12 +109,17 @@ function ResultContent({ id }: { id: string }) {
     );
   }
 
+  if (!prefill) {
+    return <AssessmentResultSkeleton />;
+  }
+
   return (
     <SkillAssessmentResultView
       topicLabel={topicLabel(assessment.topic, assessment.customTopic)}
       questions={assessment.questions}
       submission={submission}
       answers={answersMap}
+      prefill={prefill}
     />
   );
 }

@@ -18,6 +18,13 @@ export function getMyAchievements(): Promise<MyAchievements> {
   return apiClient<MyAchievements>('/gamification/me');
 }
 
-export function listAchievements(): Promise<{ achievements: EarnedAchievement[] }> {
-  return apiClient<{ achievements: EarnedAchievement[] }>('/gamification/achievements');
+export interface CatalogAchievement {
+  key: string;
+  title: string;
+  description?: string;
+  icon?: string;
+}
+
+export function listAchievements(): Promise<{ achievements: CatalogAchievement[] }> {
+  return apiClient<{ achievements: CatalogAchievement[] }>('/gamification/achievements');
 }

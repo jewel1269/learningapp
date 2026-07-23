@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useLogin, useSignup } from './useAuth';
 import { ApiError } from '@/src/infrastructure/apiClient';
+import { useTranslation } from '@/src/i18n';
 import { PasswordStrength } from './PasswordStrength';
 import { AuthIllustration } from './AuthIllustration';
 
@@ -32,6 +33,7 @@ function authSwitchHref(mode: 'login' | 'signup') {
 }
 
 export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
+  const { t } = useTranslation();
   const isSignup = mode === 'signup';
   const login = useLogin();
   const signup = useSignup();
@@ -59,11 +61,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLocalError(null);
-    if (isSignup && !fullName.trim()) return setLocalError('Enter your full name.');
-    if (!emailRe.test(email)) return setLocalError('Enter a valid email address.');
+    if (isSignup && !fullName.trim()) return setLocalError(t('auth.errorName'));
+    if (!emailRe.test(email)) return setLocalError(t('auth.errorEmail'));
     if (isSignup && password.length < 8)
-      return setLocalError('Password must be at least 8 characters.');
-    if (!password) return setLocalError('Enter your password.');
+      return setLocalError(t('auth.errorPasswordShort'));
+    if (!password) return setLocalError(t('auth.errorPasswordRequired'));
     mutation.mutate({ email: email.trim(), password });
   }
 
@@ -87,12 +89,12 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
               <ArrowLeft className="size-4" />
             </Link>
             <p className="text-sm text-ink-2">
-              {isSignup ? 'Already have an account? ' : "Don't have an account? "}
+              {isSignup ? t('auth.alreadyHaveAccount') + ' ' : t('auth.noAccount') + ' '}
               <Link
                 href={switchHref}
                 className="font-semibold text-primary transition-colors hover:text-primary-dark"
               >
-                {isSignup ? 'Sign In' : 'Sign Up'}
+                {isSignup ? t('common.signIn') : t('common.signUp')}
               </Link>
             </p>
           </div>
@@ -108,12 +110,10 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
           {/* Heading */}
           <div className="mb-7">
             <h1 className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl dark:text-white">
-              {isSignup ? 'Create your account' : 'Welcome back'}
+              {isSignup ? t('auth.createAccount') : t('auth.welcomeBack')}
             </h1>
             <p className="mt-2 text-sm text-ink-2">
-              {isSignup
-                ? 'Start building real skills in minutes — free.'
-                : 'Log in to continue learning.'}
+              {isSignup ? t('auth.signupSubtitle') : t('auth.loginSubtitle')}
             </p>
           </div>
 
@@ -317,13 +317,13 @@ const LANGUAGES = [
 ];
 
 function AuthLanguageSelector() {
+  const { locale, setLocale } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState('en');
   const [search, setSearch] = useState('');
   const ref = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const current = LANGUAGES.find((l) => l.code === selected)!;
+  const current = LANGUAGES.find((l) => l.code === locale) ?? LANGUAGES[0];
 
   const filtered = LANGUAGES.filter(
     (l) =>
@@ -397,19 +397,19 @@ function AuthLanguageSelector() {
                     key={lang.code}
                     type="button"
                     onClick={() => {
-                      setSelected(lang.code);
+                      setLocale(lang.code as typeof locale);
                       setOpen(false);
                       setSearch('');
                     }}
                     className={`flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-xs transition-colors ${
-                      lang.code === selected
+                      lang.code === locale
                         ? 'bg-primary-soft text-primary'
                         : 'text-ink-2 hover:bg-bg-soft'
                     }`}
                   >
                     <span className="text-sm">{lang.flag}</span>
                     <span className="flex-1 font-medium">{lang.name}</span>
-                    {lang.code === selected && <Check className="size-3.5 text-primary" />}
+                    {lang.code === locale && <Check className="size-3.5 text-primary" />}
                   </button>
                 ))
               )}

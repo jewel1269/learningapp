@@ -8,7 +8,8 @@ export interface ExamPromptInput {
 
 export const EXAM_SYSTEM_PROMPT =
   'You are an assessment author. Generate a broader assessment spanning multiple ' +
-  "lessons for the given scope. Provide each question's correct/reference answer.";
+  'lessons for the given scope. Return JSON with a top-level questions array. Each question ' +
+  'must use type "mcq" or "short_answer" and correctAnswer (not answer).';
 
 export function buildExamPrompt(input: ExamPromptInput): string {
   return [
@@ -16,6 +17,12 @@ export function buildExamPrompt(input: ExamPromptInput): string {
     `Topics: ${input.topics.join(', ')}`,
     `Number of questions: ${input.questionCount ?? 10}`,
     '',
-    'Generate a comprehensive exam with a mix of question types and answers.',
+    'Generate a comprehensive exam with a mix of question types.',
+    'Return exactly this JSON shape:',
+    '{',
+    '  "questions": [',
+    '    { "question": "...", "type": "mcq", "options": ["A","B","C","D"], "correctAnswer": "A" }',
+    '  ]',
+    '}',
   ].join('\n');
 }

@@ -7,6 +7,12 @@ export const generateForLesson = asyncHandler(async (req, res) => {
   res.status(201).json({ quiz });
 });
 
+// GET /quizzes/mine — quiz submission history for the authenticated user.
+export const listMine = asyncHandler(async (req, res) => {
+  const submissions = await quizService.listMyQuizSubmissions(req.user!.id);
+  res.json({ submissions });
+});
+
 // GET /quizzes/:id — fetch a quiz to take (answers stripped by toJSON).
 export const getQuiz = asyncHandler(async (req, res) => {
   const quiz = await quizService.getQuiz(req.user!.id, req.params.id);

@@ -14,10 +14,32 @@ export type SubmissionEvaluator = (
   submissionData: unknown,
 ) => Promise<ExerciseEvaluation>;
 
-const EvaluationSchema = z.object({
-  score: z.number().min(0).max(100),
-  feedback: z.string(),
-});
+const EvaluationSchema = z
+  .object({
+    score: z.union([z.number(), z.string()]).optional(),
+    feedback: z.string().optional(),
+    comment: z.string().optional(),
+  })
+  .passthrough()
+  .transform((data) => {
+    const rawScore = data.score;
+    const score =
+      typeof rawScore === 'number'
+        ? rawScore
+        : typeof rawScore === 'string'
+          ? Number.parseFloat(rawScore)
+          : Number.NaN;
+    return {
+      score,
+      feedback: (data.feedback ?? data.comment ?? 'Graded.').trim(),
+    };
+  })
+  .pipe(
+    z.object({
+      score: z.number().min(0).max(100),
+      feedback: z.string().min(1),
+    }),
+  );
 
 // Default AI evaluator (§1.6). Injectable so tests avoid the provider.
 // (Domain-specific execution — running code, matching SOC/network answers — plugs in at §9.)

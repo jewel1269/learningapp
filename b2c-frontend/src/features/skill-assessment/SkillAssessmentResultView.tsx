@@ -1,9 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { Award, CheckCircle2, Sparkles, Target, XCircle } from 'lucide-react';
+import { Award, BookOpen, CheckCircle2, Route, Sparkles, Target, XCircle } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { Container } from '@/src/components/marketing/Container';
+import { CreateCourseFromRecommendation } from '@/src/features/learning-path/CreateCourseFromRecommendation';
+import {
+  getLearningPathSteps,
+  getRecommendedCourseTitle,
+  type LearningPathPrefill,
+} from '@/src/features/learning-path/learningPathRecommendation';
 import type {
   AssessmentQuestion,
   SkillAssessmentSubmission,
@@ -45,15 +51,19 @@ export function SkillAssessmentResultView({
   questions,
   submission,
   answers,
+  prefill,
 }: {
   topicLabel: string;
   questions: AssessmentQuestion[];
   submission: SkillAssessmentSubmission;
   answers: Record<number, string>;
+  prefill: LearningPathPrefill;
 }) {
   const levelInfo = LEVEL_COPY[submission.level];
   const results = [...submission.results].sort((a, b) => a.questionIndex - b.questionIndex);
   const correctCount = results.filter((r) => r.correct).length;
+  const pathSteps = getLearningPathSteps(prefill);
+  const recommendedTitle = getRecommendedCourseTitle(prefill);
 
   return (
     <div className="pb-16 pt-8 lg:pt-12">
@@ -84,6 +94,40 @@ export function SkillAssessmentResultView({
               </span>
             </div>
             <p className="mx-auto mt-5 max-w-2xl text-base text-ink-2">{levelInfo.description}</p>
+          </div>
+        </div>
+
+        <div className="mt-10 overflow-hidden rounded-3xl border border-line/80 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.05)]">
+          <div className="border-b border-line/80 bg-gradient-to-br from-primary-soft/40 to-white px-6 py-8 sm:px-10">
+            <div className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-primary">
+              <Route className="size-4" />
+              Your learning path
+            </div>
+            <h2 className="mt-3 text-2xl font-bold text-ink sm:text-3xl">{recommendedTitle}</h2>
+            <p className="mt-2 max-w-2xl text-sm text-ink-2 sm:text-base">
+              Based on your {submission.score}% score, we recommend this {prefill.courseLevel}-level
+              course in {prefill.category}. Generate it now — tailored modules, labs, and quizzes
+              included.
+            </p>
+          </div>
+
+          <div className="grid gap-4 p-6 sm:grid-cols-3 sm:p-8">
+            {pathSteps.map((step, index) => (
+              <div
+                key={step.title}
+                className="rounded-2xl border border-line/80 bg-[#FCFCFC] p-5"
+              >
+                <span className="grid size-9 place-items-center rounded-xl bg-primary-soft text-sm font-bold text-primary">
+                  {index + 1}
+                </span>
+                <h3 className="mt-4 font-semibold text-ink">{step.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-ink-2">{step.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-line/80 bg-[#FCFCFC] px-6 py-6 sm:px-8">
+            <CreateCourseFromRecommendation prefill={prefill} />
           </div>
         </div>
 
@@ -149,15 +193,16 @@ export function SkillAssessmentResultView({
         </div>
 
         <div className="mt-10 flex flex-wrap gap-3 rounded-3xl border border-line/80 bg-white p-6 shadow-[0_12px_40px_rgba(15,23,42,0.05)]">
-          <Link href="/#categories">
+          <Link href="/assessments">
             <Button size="lg" className="bg-primary hover:bg-primary-dark">
               <Sparkles className="size-4" />
-              Browse courses
+              Take another assessment
             </Button>
           </Link>
-          <Link href="/signup">
+          <Link href="/dashboard">
             <Button size="lg" variant="soft">
-              Create free account
+              <BookOpen className="size-4" />
+              Go to dashboard
             </Button>
           </Link>
         </div>

@@ -109,3 +109,46 @@ export async function submitExam(
   await safeAward(userId, { assessmentScore: score }); // §3 assessment achievements
   return submission;
 }
+
+export async function listMyExamSubmissions(userId: string) {
+  const submissions = await ExamSubmission.find({ userId })
+    .sort({ submittedAt: -1 })
+    .limit(50)
+    .lean();
+  if (submissions.length === 0) return [];
+
+  const examIds = [...new Set(submissions.map((s) => String(s.examId)))];
+  const exams = await Exam.find({ _id: { $in: examIds }, userId }).lean();
+  const examMap = new Map(exams.map((e) => [String(e._id), e]));
+
+  const moduleIds = exams.filter((e) => e.scope === 'module').map((e) => e.scopeId);
+  const courseIds = exams.filter((e) => e.scope === 'course').map((e) => e.scopeId);
+  const [modules, courses] = await Promise.all([
+    moduleIds.length ? Module.find({ _id: { $in: moduleIds } }).lean() : [],
+    courseIds.length ? Course.find({ _id: { $in: courseIds }, userId }).lean() : [],
+  ]);
+  const moduleMap = new Map(modules.map((m) => [String(m._id), m]));
+  const courseMap = new Map(courses.map((c) => [String(c._id), c]));
+
+  return submissions.map((s) => {
+    const exam = examMap.get(String(s.examId));
+    const scope = exam?.scope as 'module' | 'course' | undefined;
+    const scopeId = exam ? String(exam.scopeId) : null;
+    let scopeTitle = 'Exam';
+    if (exam && scope === 'module') {
+      scopeTitle = (moduleMap.get(String(exam.scopeId))?.title as string | undefined) ?? 'Module exam';
+    } else if (exam && scope === 'course') {
+      scopeTitle = (courseMap.get(String(exam.scopeId))?.title as string | undefined) ?? 'Course exam';
+    }
+    return {
+      id: String(s._id),
+      examId: String(s.examId),
+      scope: scope ?? 'module',
+      scopeId,
+      scopeTitle,
+      score: s.score as number,
+      submittedAt: s.submittedAt as Date,
+      questionCount: Array.isArray(exam?.questions) ? exam!.questions.length : 0,
+    };
+  });
+}

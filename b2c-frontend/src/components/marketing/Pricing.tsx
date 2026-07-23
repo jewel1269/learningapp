@@ -1,125 +1,207 @@
 'use client';
 
 import Link from 'next/link';
-import { Check, Sparkles } from 'lucide-react';
-import { buttonClasses } from '@/src/components/ui/button';
+import { ArrowRight, Check, Sparkles } from 'lucide-react';
 import {
-  PREMIUM_ONLY_FEATURES,
+  FREE_PLAN_FEATURES,
   PREMIUM_PLAN_FEATURES,
   PREMIUM_PRICE_USD,
-  TRIAL_PERIOD_MONTHS,
-  TRIAL_PLAN_FEATURES,
+  STANDARD_PLAN_FEATURES,
+  STANDARD_PRICE_USD,
 } from '@/src/constants/pricing';
 import { useAuthHydrated } from '@/src/features/auth/useAuthHydrated';
 import { useAuthStore } from '@/src/store/authStore';
 import { Container } from './Container';
 import { cn } from '@/src/lib/utils';
 
-function Feature({ children }: { children: React.ReactNode }) {
+type PlanId = 'free' | 'standard' | 'premium';
+
+type PlanConfig = {
+  id: PlanId;
+  name: string;
+  subtitle: string;
+  price: number;
+  period: string;
+  features: readonly string[];
+  featured?: boolean;
+};
+
+const PLANS: PlanConfig[] = [
+  {
+    id: 'free',
+    name: 'Free',
+    subtitle: 'Perfect for getting started',
+    price: 0,
+    period: 'forever',
+    features: FREE_PLAN_FEATURES,
+  },
+  {
+    id: 'standard',
+    name: 'Standard',
+    subtitle: 'Perfect for individuals',
+    price: STANDARD_PRICE_USD,
+    period: 'month',
+    features: STANDARD_PLAN_FEATURES,
+    featured: true,
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    subtitle: 'Perfect for power learners',
+    price: PREMIUM_PRICE_USD,
+    period: 'month',
+    features: PREMIUM_PLAN_FEATURES,
+  },
+];
+
+function PlanCard({
+  plan,
+  href,
+  cta,
+}: {
+  plan: PlanConfig;
+  href: string;
+  cta: string;
+}) {
+  const isFeatured = plan.featured;
+
   return (
-    <li className="grid grid-cols-[20px_1fr] gap-2.5 text-sm text-ink-2">
-      <Check className="mt-0.5 size-4 shrink-0 text-good" strokeWidth={2.6} />
-      {children}
-    </li>
+    <article
+      className={cn(
+        'relative flex flex-col rounded-[10px] px-7 py-9 sm:px-8 sm:py-10 border border-line/50',
+        isFeatured
+          ? 'bg-[#1E293B] text-white shadow-[0_24px_60px_rgba(15,23,42,0.22)] lg:-mt-4 lg:mb-4 lg:scale-[1.03]'
+          : 'bg-[#F3F4F6] text-ink',
+      )}
+    >
+      {isFeatured ? (
+        <span className="absolute -right-1 top-6 rotate-45 bg-secondary px-8 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">
+          Most Popular
+        </span>
+      ) : null}
+
+      <div>
+        <h3 className="text-[22px] font-bold">{plan.name}</h3>
+        <p className={cn('mt-1 text-sm', isFeatured ? 'text-white/70' : 'text-ink-3')}>
+          {plan.subtitle}
+        </p>
+      </div>
+
+      <div className="mt-6 flex items-end gap-1">
+        <span className="text-[42px] font-bold leading-none tracking-tight">${plan.price}</span>
+        <span className={cn('pb-1 text-sm font-medium', isFeatured ? 'text-white/60' : 'text-ink-3')}>
+          /{plan.period}
+        </span>
+      </div>
+
+      <div className={cn('my-6 h-px', isFeatured ? 'bg-white/15' : 'bg-line')} />
+
+      <ul className="flex flex-1 flex-col gap-3.5">
+        {plan.features.map((feature) => (
+          <li key={feature} className="flex items-start gap-3 text-sm leading-6">
+            <Check
+              className={cn('mt-0.5 size-4 shrink-0', isFeatured ? 'text-primary-2' : 'text-primary')}
+              strokeWidth={2.5}
+            />
+            <span className={isFeatured ? 'text-white/85' : 'text-ink-2'}>{feature}</span>
+          </li>
+        ))}
+      </ul>
+
+      <Link
+        href={href}
+        className={cn(
+          'mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-[4px] text-sm font-semibold transition-colors',
+          isFeatured
+            ? 'bg-primary text-white hover:bg-primary-dark'
+            : 'bg-primary text-white hover:bg-primary-dark',
+        )}
+      >
+        {cta}
+        <ArrowRight className="size-4" />
+      </Link>
+    </article>
   );
 }
 
-export function Pricing({ fullPage = false }: { fullPage?: boolean }) {
+function PricingPlans({ fullPage = false }: { fullPage?: boolean }) {
   const hydrated = useAuthHydrated();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated());
 
-  const trialHref = hydrated && isAuthenticated ? '/dashboard' : '/signup';
-  const premiumHref = hydrated && isAuthenticated ? '/upgrade' : '/signup';
+  function planHref(id: PlanId) {
+    if (id === 'premium') return hydrated && isAuthenticated ? '/upgrade' : '/signup';
+    return hydrated && isAuthenticated ? '/dashboard' : '/signup';
+  }
+
+  function planCta(id: PlanId) {
+    if (id === 'free') return hydrated && isAuthenticated ? 'Go to dashboard' : 'Select plan';
+    if (id === 'standard') return hydrated && isAuthenticated ? 'Current plan' : 'Select plan';
+    return hydrated && isAuthenticated ? 'Upgrade now' : 'Select plan';
+  }
 
   return (
-    <section id="pricing" className={cn(fullPage ? 'pb-8 pt-28 sm:pt-32' : 'py-20')}>
-      <Container>
-        {fullPage ? (
-          <div className="mx-auto mb-10 max-w-[720px] text-center">
-            <span className="inline-flex rounded-full bg-primary-soft px-3.5 py-1.5 text-[12.5px] font-semibold text-primary">
-              Pricing
-            </span>
-            <h1 className="mt-4 text-[clamp(2rem,4.5vw,3rem)] font-bold tracking-tight text-ink">
-              3 months free, then choose Premium
+    <section
+      id="pricing"
+      className={cn(
+        'relative overflow-hidden pb-12 sm:pb-24',
+        fullPage ? 'pt-20 sm:pt-32' : 'pt-6',
+      )}
+    >
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 10% 20%, rgba(0,127,142,0.06) 0%, transparent 40%), radial-gradient(circle at 90% 10%, rgba(251,191,36,0.08) 0%, transparent 35%)',
+        }}
+      />
+
+      <Container className="relative">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+            <Sparkles className="size-3.5" />
+            Pricing table
+          </span>
+          {fullPage ? (
+            <h1 className="mt-5 text-[clamp(1.75rem,4vw,2.75rem)] font-bold tracking-tight text-ink">
+              Great{' '}
+              <span className="relative inline-block">
+                Membership
+                <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-primary/80" />
+              </span>{' '}
+              Plan
             </h1>
-            <p className="mt-4 text-sm text-ink-2 sm:text-base">
-              Start with {TRIAL_PERIOD_MONTHS} months on us. After that, subscribe to keep learning.
-              Some power features always require Premium.
-            </p>
-          </div>
-        ) : (
-          <div className="mx-auto mb-11 flex max-w-[640px] flex-col items-center gap-3.5 text-center">
-            <span className="inline-flex rounded-full bg-primary-soft px-3.5 py-1.5 text-[12.5px] font-semibold text-primary">
-              Pricing
-            </span>
-            <h2 className="text-[clamp(1.75rem,4vw,2.6rem)] font-bold tracking-tight">
-              3 months free, then Premium.
+          ) : (
+            <h2 className="mt-5 text-[clamp(1.75rem,4vw,2.75rem)] font-bold tracking-tight text-ink">
+              Great{' '}
+              <span className="relative inline-block">
+                Membership
+                <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-primary/80" />
+              </span>{' '}
+              Plan
             </h2>
-          </div>
-        )}
+          )}
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-ink-2 sm:text-base">
+            Choose the plan that fits your learning goals. Start free, grow with Standard, or unlock
+            everything with Premium.
+          </p>
+        </div>
 
-        <div className="rounded-[26px] bg-bg-lav p-6 sm:p-11">
-          <div className="mx-auto grid max-w-[880px] gap-5 md:grid-cols-2">
-            <div className="flex flex-col gap-4 rounded-[20px] border border-line bg-bg p-8">
-              <div className="text-sm font-semibold text-ink-2">Free trial</div>
-              <div className="text-4xl font-extrabold tracking-tight text-ink">
-                $0
-                <span className="text-sm font-medium text-ink-3">
-                  {' '}
-                  / {TRIAL_PERIOD_MONTHS} months
-                </span>
-              </div>
-              <p className="text-sm text-ink-2">
-                Full platform access with standard limits. No credit card required.
-              </p>
-              <ul className="flex flex-col gap-2.5">
-                {TRIAL_PLAN_FEATURES.map((feature) => (
-                  <Feature key={feature}>{feature}</Feature>
-                ))}
-              </ul>
-              <Link
-                href={trialHref}
-                className={buttonClasses({ variant: 'soft', className: 'mt-auto w-full' })}
-              >
-                {hydrated && isAuthenticated ? 'Go to dashboard' : 'Start free trial'}
-              </Link>
-            </div>
-
-            <div className="relative flex flex-col gap-4 rounded-[20px] border-2 border-primary bg-bg p-8 shadow-card">
-              <span className="absolute -top-3 left-8 rounded-full bg-primary px-3 py-1 text-[11px] font-semibold text-primary-ink">
-                After trial + premium extras
-              </span>
-              <div className="text-sm font-semibold text-ink-2">Premium</div>
-              <div className="text-4xl font-extrabold tracking-tight text-ink">
-                ${PREMIUM_PRICE_USD}
-                <span className="text-sm font-medium text-ink-3"> / month</span>
-              </div>
-              <p className="text-sm text-ink-2">
-                Required after your trial ends. Unlocks higher limits and premium-only features.
-              </p>
-              <ul className="flex flex-col gap-2.5">
-                {PREMIUM_PLAN_FEATURES.map((feature) => (
-                  <Feature key={feature}>{feature}</Feature>
-                ))}
-              </ul>
-              <div className="rounded-xl border border-secondary/20 bg-secondary-soft px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-secondary">
-                  Premium-only (pay anytime)
-                </p>
-                <ul className="mt-2 space-y-1.5 text-sm text-ink-2">
-                  {PREMIUM_ONLY_FEATURES.map((feature) => (
-                    <li key={feature}>• {feature}</li>
-                  ))}
-                </ul>
-              </div>
-              <Link href={premiumHref} className={buttonClasses({ className: 'mt-auto w-full' })}>
-                <Sparkles className="size-4" />
-                {hydrated && isAuthenticated ? 'Upgrade now' : 'Sign up & upgrade'}
-              </Link>
-            </div>
-          </div>
+        <div className="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-3 lg:items-center lg:gap-5">
+          {PLANS.map((plan) => (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              href={planHref(plan.id)}
+              cta={planCta(plan.id)}
+            />
+          ))}
         </div>
       </Container>
     </section>
   );
+}
+
+export function Pricing({ fullPage = false }: { fullPage?: boolean }) {
+  return <PricingPlans fullPage={fullPage} />;
 }

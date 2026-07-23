@@ -13,6 +13,12 @@ export const generateForCourse = asyncHandler(async (req, res) => {
   res.status(201).json({ exam });
 });
 
+// GET /exams/mine — exam submission history for the authenticated user.
+export const listMine = asyncHandler(async (req, res) => {
+  const submissions = await examService.listMyExamSubmissions(req.user!.id);
+  res.json({ submissions });
+});
+
 // GET /exams/:id — fetch an exam to take (answers stripped by toJSON).
 export const getExam = asyncHandler(async (req, res) => {
   const exam = await examService.getExam(req.user!.id, req.params.id);

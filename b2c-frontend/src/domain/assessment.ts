@@ -89,3 +89,24 @@ export interface SkillAssessmentQuota {
   used: number;
   remaining: number | null;
 }
+
+export interface QuizHistoryItem {
+  id: string;
+  quizId: string;
+  lessonId: string | null;
+  lessonTitle: string;
+  score: number;
+  submittedAt: string;
+  questionCount: number;
+}
+
+export interface ExamHistoryItem {
+  id: string;
+  examId: string;
+  scope: ExamScope;
+  scopeId: string | null;
+  scopeTitle: string;
+  score: number;
+  submittedAt: string;
+  questionCount: number;
+}

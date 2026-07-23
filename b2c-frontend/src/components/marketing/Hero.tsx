@@ -239,7 +239,8 @@ export function Hero() {
           </h1>
 
           <p className="mt-5 max-w-[480px] text-[17px] leading-[30px] text-ink-2 lg:text-[20px]">
-            Enhance your educational journey with our cutting-edge course platform.
+            Take a quick skill test, discover your level, and get a personalized AI course — start
+            with 3 months free.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-6">

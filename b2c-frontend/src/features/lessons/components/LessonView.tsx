@@ -12,14 +12,23 @@ import {
   ClipboardList,
   Loader2,
   Trophy,
+  Wrench,
 } from 'lucide-react';
 import { useLesson, useStartLesson, useCompleteLesson } from '@/src/features/lessons';
 import { useCourseStructure } from '@/src/features/courses';
 import { useGenerateQuiz } from '@/src/features/assessments';
+import { useGenerateExercise } from '@/src/features/exercises';
+import { resolveLabForDomain } from '@/src/features/labs';
 import { Badge } from '@/src/components/ui/badge';
 import { Button } from '@/src/components/ui/button';
 import { Skeleton } from '@/src/components/ui/skeleton';
+import { ApiError } from '@/src/infrastructure/apiClient';
 import type { LessonContent } from '@/src/features/lessons/lessonsApi';
+
+function formatGenerationError(err: unknown, fallback: string): string {
+  if (err instanceof ApiError) return err.message;
+  return fallback;
+}
 
 function lessonText(content: LessonContent | null | undefined): string {
   if (content && typeof content.summary === 'string') return content.summary.trim();
@@ -39,6 +48,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
   const { mutate: startLesson } = useStartLesson();
   const completeMut = useCompleteLesson();
   const quizGen = useGenerateQuiz();
+  const exerciseGen = useGenerateExercise();
 
   // Mark the lesson in-progress the first time it's opened (once per lesson id).
   const startedFor = useRef<string | null>(null);
@@ -61,6 +71,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
       prev: idx > 0 ? flat[idx - 1] : null,
       next: idx >= 0 && idx < flat.length - 1 ? flat[idx + 1] : null,
       moduleTitle: currentModule?.title ?? null,
+      moduleDomain: currentModule?.domain ?? null,
       position: idx >= 0 ? { n: idx + 1, total: flat.length } : null,
     };
   }, [structureQ.data, lessonId]);
@@ -78,7 +89,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
   if (lessonQ.isError || !lessonQ.data) {
     return (
       <Shell>
-        <Link href="/courses" className="text-sm font-medium text-ink-2 hover:text-primary">
+        <Link href="/my-courses" className="text-sm font-medium text-ink-2 hover:text-primary">
           <ArrowLeft className="mr-1 inline size-4" /> All courses
         </Link>
         <div className="mt-6 rounded-2xl border border-line bg-bg-elev p-10 text-center">
@@ -99,11 +110,12 @@ export function LessonView({ lessonId }: { lessonId: string }) {
     completeMut.isSuccess && completeMut.variables === lessonId ? completeMut.data : null;
   const completeFailed = completeMut.isError && completeMut.variables === lessonId;
   const done = isCompleted || Boolean(justCompleted);
+  const labMeta = nav.moduleDomain ? resolveLabForDomain(nav.moduleDomain) : null;
 
   return (
     <Shell>
       <Link
-        href={courseId ? `/courses/${courseId}` : '/courses'}
+        href={courseId ? `/courses/${courseId}` : '/my-courses'}
         className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-primary"
       >
         <ArrowLeft className="size-4" />
@@ -120,6 +132,9 @@ export function LessonView({ lessonId }: { lessonId: string }) {
           <span className="inline-flex items-center gap-1 text-xs font-semibold text-good">
             <CheckCircle2 className="size-4" /> Completed
           </span>
+        )}
+        {labMeta && (
+          <Badge variant="default">{labMeta.label}</Badge>
         )}
       </div>
 
@@ -199,7 +214,48 @@ export function LessonView({ lessonId }: { lessonId: string }) {
         </div>
         {quizGen.isError && (
           <p className="mt-3 text-sm text-bad">
-            Couldn&rsquo;t generate a quiz right now. You may have reached your daily limit.
+            {formatGenerationError(
+              quizGen.error,
+              'Couldn\u2019t generate a quiz right now. Please try again.',
+            )}
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-line bg-bg-soft p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="font-semibold text-ink">Hands-on practice</h3>
+            <p className="text-sm text-ink-2">
+              {labMeta
+                ? `Generate an AI exercise in the ${labMeta.label.toLowerCase()}.`
+                : 'Generate an AI exercise for this lesson.'}
+            </p>
+          </div>
+          <Button
+            variant="soft"
+            onClick={() =>
+              exerciseGen.mutate(lessonId, {
+                onSuccess: (exercise) =>
+                  router.push(`/lesson/${lessonId}/exercise/${exercise.id}`),
+              })
+            }
+            disabled={exerciseGen.isPending}
+          >
+            {exerciseGen.isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Wrench className="size-4" />
+            )}
+            Start exercise
+          </Button>
+        </div>
+        {exerciseGen.isError && (
+          <p className="mt-3 text-sm text-bad">
+            {formatGenerationError(
+              exerciseGen.error,
+              'Couldn\u2019t generate an exercise right now. Please try again.',
+            )}
           </p>
         )}
       </div>

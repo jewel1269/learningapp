@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 
 // Set the theme class before paint to avoid a flash of the wrong theme.
 const themeScript = `(function(){try{var t=localStorage.getItem('abc-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme:dark)').matches;document.documentElement.classList.toggle('dark',d);}catch(e){}})();`;
+const localeScript = `(function(){try{var l=localStorage.getItem('bina-locale');if(l)document.documentElement.lang=l;}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -35,6 +36,7 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: localeScript }} />
       </head>
       <body className="min-h-full bg-bg text-ink flex flex-col">
         <AppProviders>{children}</AppProviders>

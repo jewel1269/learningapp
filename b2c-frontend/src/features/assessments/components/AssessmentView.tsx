@@ -30,7 +30,7 @@ export function AssessmentView({
   questions: AssessmentQuestion[];
   submission: AssessmentSubmission | null;
   submitting: boolean;
-  submitError: boolean;
+  submitError?: string | null;
   onSubmit: (answers: SubmittedAnswer[]) => void;
   backHref: string;
   backLabel: string;
@@ -120,7 +120,7 @@ export function AssessmentView({
       </div>
 
       {submitError && (
-        <p className="mt-6 text-sm text-bad">Couldn&rsquo;t submit your answers. Please try again.</p>
+        <p className="mt-6 text-sm text-bad">{submitError}</p>
       )}
 
       <div className="mt-8 border-t border-line pt-6">

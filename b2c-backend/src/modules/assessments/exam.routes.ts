@@ -8,6 +8,7 @@ const router = Router();
 
 router.use(authenticate);
 
+router.get('/mine', controller.listMine);
 router.get('/:id', controller.getExam);
 router.post('/:id/submit', validate({ body: submitSchema }), controller.submitExam);
 

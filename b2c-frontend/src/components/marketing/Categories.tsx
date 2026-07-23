@@ -41,13 +41,13 @@ function CategoryCard({
         <p className="text-[16px] font-semibold italic leading-[26px] text-primary">{courses} Courses</p>
 
         <h3 className="mb-10 mt-1 text-[24px] font-semibold leading-[31px] text-ink">
-          <Link href="#courses" className="transition-colors hover:text-primary">
+          <Link href="/assessments" className="transition-colors hover:text-primary">
             {title}
           </Link>
         </h3>
 
         <Link
-          href="#courses"
+          href="/assessments"
           className="inline-flex items-center gap-2.5 rounded-full bg-secondary px-6 py-3 text-[18px] font-medium text-white transition-colors hover:bg-secondary-2"
         >
           View More

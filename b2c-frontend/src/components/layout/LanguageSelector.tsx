@@ -3,10 +3,12 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Globe, Check, Search, ChevronDown } from 'lucide-react';
+import { useTranslation } from '@/src/i18n';
+import type { Locale } from '@/src/i18n';
 import { cn } from '@/src/lib/utils';
 
 interface Language {
-  code: string;
+  code: Locale;
   name: string;
   nativeName: string;
   flag: string;
@@ -26,13 +28,13 @@ const languages: Language[] = [
 ];
 
 export function LanguageSelector({ compact = false }: { compact?: boolean }) {
+  const { locale, setLocale } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState('en');
   const [search, setSearch] = useState('');
   const ref = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const current = languages.find((l) => l.code === selected)!;
+  const current = languages.find((l) => l.code === locale) ?? languages[0];
 
   const filtered = useMemo(
     () =>
@@ -61,7 +63,6 @@ export function LanguageSelector({ compact = false }: { compact?: boolean }) {
     }
   }, [open]);
 
-  // Keyboard navigation
   useEffect(() => {
     if (!open) return;
     function handleKey(e: KeyboardEvent) {
@@ -110,7 +111,6 @@ export function LanguageSelector({ compact = false }: { compact?: boolean }) {
             transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
             className="absolute right-0 top-full z-50 mt-2 w-[240px] overflow-hidden rounded-2xl border border-[#F1F5F9] bg-white shadow-[0_20px_40px_-12px_rgba(15,23,42,0.12)]"
           >
-            {/* Search */}
             <div className="border-b border-[#F1F5F9] p-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
@@ -125,20 +125,17 @@ export function LanguageSelector({ compact = false }: { compact?: boolean }) {
               </div>
             </div>
 
-            {/* Language list */}
             <div className="max-h-[280px] overflow-y-auto p-1.5">
               {filtered.length === 0 ? (
-                <div className="py-6 text-center text-sm text-ink-3">
-                  No languages found
-                </div>
+                <div className="py-6 text-center text-sm text-ink-3">No languages found</div>
               ) : (
                 filtered.map((lang) => {
-                  const isSelected = lang.code === selected;
+                  const isSelected = lang.code === locale;
                   return (
                     <button
                       key={lang.code}
                       onClick={() => {
-                        setSelected(lang.code);
+                        setLocale(lang.code);
                         setOpen(false);
                         setSearch('');
                       }}
@@ -156,9 +153,7 @@ export function LanguageSelector({ compact = false }: { compact?: boolean }) {
                           {lang.nativeName}
                         </span>
                       </div>
-                      {isSelected && (
-                        <Check className="size-4 shrink-0 text-primary" />
-                      )}
+                      {isSelected && <Check className="size-4 shrink-0 text-primary" />}
                     </button>
                   );
                 })

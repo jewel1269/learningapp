@@ -1,3 +1,3 @@
-// exercises feature barrel
-// TODO: implement
-export {};
+export * from './exercisesApi';
+export * from './useExercises';
+export { ExerciseView } from './components/ExerciseView';

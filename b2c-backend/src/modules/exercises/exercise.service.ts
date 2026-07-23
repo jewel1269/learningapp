@@ -9,11 +9,54 @@ import { EXERCISE_SYSTEM_PROMPT, buildExercisePrompt } from '../ai-guidance/prom
 import { resolveOwnedLesson } from '../lessons/lesson.service';
 import { gradingQueue, jobPriority } from '../../jobs/queue';
 
-export const GeneratedExerciseSchema = z.object({
-  description: z.string().min(1),
-  starterState: z.unknown().optional(),
-  rubric: z.unknown().optional(),
-});
+export const GeneratedExerciseSchema = z
+  .object({
+    description: z.string().min(1).optional(),
+    task: z.string().min(1).optional(),
+    exercise: z
+      .object({
+        description: z.string().min(1).optional(),
+        title: z.string().min(1).optional(),
+        language: z.string().optional(),
+      })
+      .passthrough()
+      .optional(),
+    starterState: z.unknown().optional(),
+    starter_state: z.unknown().optional(),
+    rubric: z.unknown().optional(),
+  })
+  .passthrough()
+  .transform((data) => {
+    const nested = data.exercise;
+    const description =
+      data.description?.trim() ||
+      nested?.description?.trim() ||
+      data.task?.trim() ||
+      nested?.title?.trim() ||
+      '';
+
+    const rawStarter = data.starterState ?? data.starter_state ?? {};
+    const starterState =
+      rawStarter && typeof rawStarter === 'object'
+        ? {
+            ...(rawStarter as Record<string, unknown>),
+            ...(nested?.language ? { language: nested.language } : {}),
+          }
+        : rawStarter;
+
+    return {
+      description,
+      starterState,
+      rubric: data.rubric ?? {},
+    };
+  })
+  .pipe(
+    z.object({
+      description: z.string().min(1),
+      starterState: z.unknown().optional(),
+      rubric: z.unknown().optional(),
+    }),
+  );
 export type GeneratedExercise = z.infer<typeof GeneratedExerciseSchema>;
 
 export type ExerciseGenerator = (input: {

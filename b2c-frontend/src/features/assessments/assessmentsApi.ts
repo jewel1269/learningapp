@@ -1,5 +1,12 @@
 import { apiClient } from '@/src/infrastructure/apiClient';
-import type { Quiz, Exam, AssessmentSubmission, SubmittedAnswer } from '@/src/domain/assessment';
+import type {
+  Quiz,
+  Exam,
+  AssessmentSubmission,
+  SubmittedAnswer,
+  QuizHistoryItem,
+  ExamHistoryItem,
+} from '@/src/domain/assessment';
 
 // ── Quizzes (lesson-scoped) ────────────────────────────────────────────────
 export function generateQuiz(lessonId: string): Promise<Quiz> {
@@ -47,4 +54,12 @@ export function submitExam(
     method: 'POST',
     body: JSON.stringify({ answers }),
   }).then((r) => r.submission);
+}
+
+export function listMyQuizzes() {
+  return apiClient<{ submissions: QuizHistoryItem[] }>('/quizzes/mine').then((r) => r.submissions);
+}
+
+export function listMyExams() {
+  return apiClient<{ submissions: ExamHistoryItem[] }>('/exams/mine').then((r) => r.submissions);
 }

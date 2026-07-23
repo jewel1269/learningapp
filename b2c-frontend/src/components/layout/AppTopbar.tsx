@@ -12,7 +12,7 @@ import { cn } from '@/src/lib/utils';
 
 const nav = [
   { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Courses', href: '/courses' },
+  { label: 'Courses', href: '/my-courses' },
   { label: 'Achievements', href: '/achievements' },
 ];
 

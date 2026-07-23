@@ -1,0 +1,104 @@
+# B2C deployment guide
+
+## Prerequisites
+
+- MongoDB + Redis (backend workers)
+- Claude API key (AI generation/grading)
+- Stripe keys (optional, for billing)
+
+## Backend (`b2c-backend`)
+
+1. Copy `.env.example` → `.env` and fill secrets.
+2. Start API + workers:
+
+```bash
+cd b2c-backend
+npm install
+npm run dev          # API on :4000
+npm run worker       # BullMQ workers (separate terminal)
+```
+
+3. Production: set `CORS_ORIGIN` to your frontend URL (e.g. `https://app.example.com`).
+
+## Frontend (`b2c-frontend`)
+
+1. Copy `.env.example` → `.env.local`:
+
+```bash
+NEXT_PUBLIC_API_URL=https://your-api.example.com
+```
+
+2. Local dev:
+
+```bash
+npm install
+npm run dev          # :3000
+```
+
+3. Production build:
+
+```bash
+npm run build
+npm run start
+```
+
+### Docker (frontend)
+
+```bash
+cd b2c-frontend
+docker build --build-arg NEXT_PUBLIC_API_URL=https://your-api.example.com -t bina-b2c-web .
+docker run -p 3000:3000 bina-b2c-web
+```
+
+## Render / Vercel
+
+| Service | Suggested platform |
+|---------|-------------------|
+| Frontend | Vercel or Render Web Service (Docker) |
+| Backend API | Render Web Service |
+| Workers | Render Background Worker |
+| MongoDB | MongoDB Atlas |
+| Redis | Upstash or Render Redis |
+
+**Frontend env on host:**
+- `NEXT_PUBLIC_API_URL` → backend public URL
+
+**Backend env on host:**
+- `CORS_ORIGIN` → frontend URL
+- `MONGO_URI`, `REDIS_URL`, `AI_PROVIDER_API_KEY`, JWT secrets, Stripe keys
+
+## Health checks
+
+- Backend: `GET /health` (if exposed) or any public route
+- Frontend: `GET /` returns 200
+
+## E2E tests
+
+Smoke tests (no backend required):
+
+```bash
+cd b2c-frontend
+npm run test:e2e
+```
+
+Full flow (requires backend + AI key):
+
+```bash
+E2E_API_URL=http://localhost:4000 npm run test:e2e -- e2e/core-flow.spec.ts
+```
+
+Optional credentials (reuse existing user instead of signup):
+
+```bash
+E2E_EMAIL=you@example.com E2E_PASSWORD=secret npm run test:e2e -- e2e/core-flow.spec.ts
+```
+
+## Admin access
+
+Promote a user to admin in MongoDB:
+
+```js
+db.users.updateOne({ email: 'admin@example.com' }, { $set: { role: 'admin' } })
+```
+
+Then visit `/admin/metrics`.

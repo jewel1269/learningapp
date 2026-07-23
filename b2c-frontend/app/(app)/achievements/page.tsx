@@ -1,8 +1,5 @@
+import { AchievementsPage } from '@/src/features/gamification';
+
 export default function Page() {
-  return (
-    <main className="p-8">
-      <h1 className="text-2xl font-semibold">Achievements</h1>
-      {/* TODO: implement */}
-    </main>
-  );
+  return <AchievementsPage />;
 }

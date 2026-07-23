@@ -19,8 +19,12 @@ export function useCourse(id: string | null) {
   });
 }
 
-export function useCourses() {
-  return useQuery({ queryKey: ['courses'], queryFn: coursesApi.listCourses });
+export function useCourses(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: ['courses'],
+    queryFn: coursesApi.listCourses,
+    enabled: options?.enabled ?? true,
+  });
 }
 
 export function useCourseStructure(id: string | null) {

@@ -12,8 +12,7 @@ import {
 
 export const NAV_LINKS = [
   { label: 'Home', href: '#top' },
-  { label: 'Learning path', href: '#categories' },
-  { label: 'course', href: '#courses' },
+  { label: 'Course', href: '/courses' },
   { label: 'pricing', href: '/pricing' },
   { label: 'contact', href: '/contact' },
   { label: 'Assessment', href: '/assessments' },

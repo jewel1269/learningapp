@@ -47,3 +47,17 @@ export function useSubmitExam(examId: string) {
     mutationFn: (answers: SubmittedAnswer[]) => assessmentsApi.submitExam(examId, answers),
   });
 }
+
+export function useMyQuizzes() {
+  return useQuery({
+    queryKey: ['quizzes', 'mine'],
+    queryFn: assessmentsApi.listMyQuizzes,
+  });
+}
+
+export function useMyExams() {
+  return useQuery({
+    queryKey: ['exams', 'mine'],
+    queryFn: assessmentsApi.listMyExams,
+  });
+}

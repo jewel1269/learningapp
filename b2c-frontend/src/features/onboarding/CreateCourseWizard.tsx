@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Check, Loader2, Sparkles, X } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
@@ -11,6 +11,7 @@ import { Switch } from '@/src/components/ui/switch';
 import { ApiError } from '@/src/infrastructure/apiClient';
 import { useCreateCourse, useCourse } from '@/src/features/courses';
 import type { CourseLevel } from '@/src/domain/course';
+import { readLearningPathPrefill } from '@/src/features/learning-path/learningPathRecommendation';
 import { cn } from '@/src/lib/utils';
 
 const CATEGORIES = ['Cybersecurity', 'Networking', 'Programming', 'Data', 'AI', 'Cloud'];
@@ -21,16 +22,39 @@ const LEVELS: { value: CourseLevel; title: string; desc: string }[] = [
 ];
 
 export function CreateCourseWizard() {
+  const searchParams = useSearchParams();
+  const autoStart = searchParams.get('auto') === '1';
+  const prefill = readLearningPathPrefill();
+
   const [step, setStep] = useState(1);
-  const [category, setCategory] = useState('');
-  const [topics, setTopics] = useState<string[]>([]);
+  const [category, setCategory] = useState(prefill?.category ?? '');
+  const [topics, setTopics] = useState<string[]>(prefill?.topics ?? []);
   const [topicInput, setTopicInput] = useState('');
-  const [level, setLevel] = useState<CourseLevel | null>(null);
+  const [level, setLevel] = useState<CourseLevel | null>(prefill?.courseLevel ?? null);
   const [visualsPreferred, setVisualsPreferred] = useState(true);
   const [dailyNotification, setDailyNotification] = useState(false);
   const [createdId, setCreatedId] = useState<string | null>(null);
+  const [autoTriggered, setAutoTriggered] = useState(false);
 
   const create = useCreateCourse();
+
+  useEffect(() => {
+    if (!autoStart || autoTriggered || createdId || !level || !category.trim() || topics.length === 0) {
+      return;
+    }
+    setAutoTriggered(true);
+    create.mutate(
+      {
+        category: category.trim(),
+        topics,
+        level,
+        visualsPreferred,
+        dailyNotification,
+      },
+      { onSuccess: (data) => setCreatedId(data.course.id) },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- auto-start once when prefill is ready
+  }, [autoStart, autoTriggered, createdId, level, category, topics]);
 
   function addTopic() {
     const t = topicInput.trim();
@@ -50,11 +74,34 @@ export function CreateCourseWizard() {
     return <GeneratingPanel id={createdId} onRetry={() => setCreatedId(null)} />;
   }
 
+  if (autoStart && prefill && (create.isPending || autoTriggered)) {
+    return (
+      <div className="w-full max-w-[560px] rounded-3xl border border-line bg-bg-elev p-9 text-center shadow-card">
+        <div className="mx-auto mb-5 grid size-16 place-items-center rounded-2xl bg-primary-soft text-primary">
+          <Loader2 className="size-8 animate-spin" />
+        </div>
+        <h1 className="text-xl font-bold">Creating your personalized course…</h1>
+        <p className="mx-auto mt-2 max-w-[42ch] text-sm text-ink-2">
+          {prefill.topicLabel} · {prefill.skillLevel} track — generating modules from your
+          assessment results.
+        </p>
+      </div>
+    );
+  }
+
   const canNext1 = category.trim().length > 0 && topics.length > 0;
   const errorMsg = create.error instanceof ApiError ? create.error.message : null;
 
   return (
     <div className="w-full max-w-[560px]">
+      {prefill && (
+        <div className="mb-6 rounded-2xl border border-primary/20 bg-primary-soft/40 p-4 text-sm text-ink-2">
+          <p className="font-semibold text-ink">From your skill assessment</p>
+          <p className="mt-1">
+            {prefill.topicLabel} · {prefill.skillLevel} — we pre-filled your course details.
+          </p>
+        </div>
+      )}
       <Stepper step={step} />
 
       <div className="mt-8 rounded-3xl border border-line bg-bg-elev p-7 shadow-card sm:p-9">
@@ -202,7 +249,7 @@ export function CreateCourseWizard() {
               <p className="rounded-lg bg-bad-soft px-3.5 py-2.5 text-sm text-bad" role="alert">
                 {errorMsg}{' '}
                 {create.error instanceof ApiError && create.error.status === 403 && (
-                  <Link href="/courses" className="font-semibold underline">
+                  <Link href="/my-courses" className="font-semibold underline">
                     View your courses
                   </Link>
                 )}
@@ -279,7 +326,7 @@ function GeneratingPanel({ id, onRetry }: { id: string; onRetry: () => void }) {
         <div className="mt-6 flex justify-center gap-3">
           <Button onClick={() => refetch()}>Retry</Button>
           <Link
-            href="/courses"
+            href="/my-courses"
             className="inline-flex h-11 items-center rounded-xl border border-line-2 px-5 text-sm font-semibold text-ink hover:bg-bg-lav"
           >
             My courses
@@ -302,7 +349,7 @@ function GeneratingPanel({ id, onRetry }: { id: string; onRetry: () => void }) {
         <div className="mt-6 flex justify-center gap-3">
           <Button onClick={onRetry}>Try again</Button>
           <Link
-            href="/courses"
+            href="/my-courses"
             className="inline-flex h-11 items-center rounded-xl border border-line-2 px-5 text-sm font-semibold text-ink hover:bg-bg-lav"
           >
             My courses

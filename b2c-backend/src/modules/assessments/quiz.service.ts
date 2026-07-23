@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { Quiz } from './quiz.model';
 import { QuizSubmission } from './quizSubmission.model';
+import { Lesson } from '../lessons/lesson.model';
 import { AppError } from '../../common/errors/AppError';
 import { getAiClient } from '../ai-guidance/ai.client';
 import { QUIZ_SYSTEM_PROMPT, buildQuizPrompt } from '../ai-guidance/prompts';
@@ -79,4 +80,34 @@ export async function submitQuiz(
   const submission = await QuizSubmission.create({ quizId: quiz._id, userId, answers, results, score });
   await safeAward(userId, { assessmentScore: score }); // §3 assessment achievements
   return submission;
+}
+
+export async function listMyQuizSubmissions(userId: string) {
+  const submissions = await QuizSubmission.find({ userId })
+    .sort({ submittedAt: -1 })
+    .limit(50)
+    .lean();
+  if (submissions.length === 0) return [];
+
+  const quizIds = [...new Set(submissions.map((s) => String(s.quizId)))];
+  const quizzes = await Quiz.find({ _id: { $in: quizIds }, userId }).lean();
+  const quizMap = new Map(quizzes.map((q) => [String(q._id), q]));
+
+  const lessonIds = [...new Set(quizzes.map((q) => String(q.lessonId)))];
+  const lessons = await Lesson.find({ _id: { $in: lessonIds } }).lean();
+  const lessonMap = new Map(lessons.map((l) => [String(l._id), l]));
+
+  return submissions.map((s) => {
+    const quiz = quizMap.get(String(s.quizId));
+    const lesson = quiz ? lessonMap.get(String(quiz.lessonId)) : null;
+    return {
+      id: String(s._id),
+      quizId: String(s.quizId),
+      lessonId: quiz ? String(quiz.lessonId) : null,
+      lessonTitle: (lesson?.title as string | undefined) ?? 'Lesson quiz',
+      score: s.score as number,
+      submittedAt: s.submittedAt as Date,
+      questionCount: Array.isArray(quiz?.questions) ? quiz!.questions.length : 0,
+    };
+  });
 }

@@ -1,6 +1,23 @@
 export const TRIAL_PERIOD_MONTHS = 3;
 export const TRIAL_PERIOD_DAYS = 90;
+export const STANDARD_PRICE_USD = 34;
 export const PREMIUM_PRICE_USD = 150;
+
+export const FREE_PLAN_FEATURES = [
+  '1 active AI course',
+  '3 skill assessments',
+  'Daily quizzes & exercises',
+  'Basic code sandbox labs',
+  'Streaks & achievements',
+] as const;
+
+export const STANDARD_PLAN_FEATURES = [
+  `${TRIAL_PERIOD_MONTHS} months free to start`,
+  '5 course generations per day',
+  '20 quiz generations per day',
+  'Hands-on labs & progress tracking',
+  'Full platform access',
+] as const;
 
 export const TRIAL_PLAN_FEATURES = [
   '3 months free — no credit card required',
@@ -30,10 +47,11 @@ export const TRIAL_INCLUDED_FEATURES = [
 ] as const;
 
 export const PREMIUM_PLAN_FEATURES = [
-  'Everything in your trial',
-  ...PREMIUM_ONLY_FEATURES,
-  '50 course generations per day',
-  '500 quiz & exercise generations per day',
+  'Up to 25 active courses',
+  'Unlimited skill assessments',
+  'Course-wide exams',
+  'Priority AI generation & grading',
+  'Advanced SOC & network labs',
 ] as const;
 
 export const PLAN_COMPARISON = [
@@ -66,5 +84,5 @@ export const PRICING_FAQ = [
   },
 ] as const;
 
-/** @deprecated Use TRIAL_PLAN_FEATURES — kept for upgrade page imports during transition */
-export const FREE_PLAN_FEATURES = TRIAL_INCLUDED_FEATURES;
+/** @deprecated Use FREE_PLAN_FEATURES — kept for upgrade page imports during transition */
+export const FREE_PLAN_FEATURES_LEGACY = TRIAL_INCLUDED_FEATURES;

@@ -20,6 +20,7 @@ exerciseSchema.set('toJSON', {
   versionKey: false,
   transform: (_doc, ret) => {
     const out = ret as Record<string, unknown>;
+    out.id = String(out._id ?? out.id);
     delete out._id;
     return out;
   },

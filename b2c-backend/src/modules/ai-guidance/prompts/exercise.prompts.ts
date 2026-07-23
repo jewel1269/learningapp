@@ -6,8 +6,10 @@ export interface ExercisePromptInput {
 }
 
 export const EXERCISE_SYSTEM_PROMPT =
-  'You are a hands-on lab designer. Generate a single practical exercise (task ' +
-  'description, starter state, and grading rubric) appropriate to the lesson domain.';
+  'You are a hands-on lab designer. Generate a single practical exercise with a clear ' +
+  'task description, starter state, and grading rubric appropriate to the lesson domain. ' +
+  'Return JSON with top-level keys: description (string), starterState (object), rubric (object). ' +
+  'For coding tasks, put starter code in starterState.code and language in starterState.language.';
 
 export function buildExercisePrompt(input: ExercisePromptInput): string {
   return [
@@ -15,6 +17,12 @@ export function buildExercisePrompt(input: ExercisePromptInput): string {
     `Lesson: ${input.lessonTitle}`,
     `Lesson summary: ${input.lessonSummary}`,
     '',
-    'Design one hands-on exercise with a description, starter state, and rubric.',
+    'Design one hands-on exercise.',
+    'Return exactly this JSON shape:',
+    '{',
+    '  "description": "step-by-step task instructions",',
+    '  "starterState": { "code": "...", "language": "javascript" },',
+    '  "rubric": { "criteria": ["..."] }',
+    '}',
   ].join('\n');
 }
