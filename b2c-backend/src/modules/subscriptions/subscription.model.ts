@@ -16,6 +16,7 @@ const subscriptionSchema = new Schema(
     priceId: { type: String },
     currentPeriodEnd: { type: Date },
     cancelAtPeriodEnd: { type: Boolean, default: false },
+    trialEndsAt: { type: Date, default: null },
   },
   { timestamps: true },
 );

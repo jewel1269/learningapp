@@ -2,6 +2,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { User } from '../users/user.model';
 import { AppError } from '../../common/errors/AppError';
 import { env } from '../../config/env';
+import { getOrCreateSubscription } from '../subscriptions/subscription.service';
 import { issueTokenPair } from './auth.service';
 
 export interface OAuthProfile {
@@ -29,6 +30,7 @@ export async function upsertOAuthUser(profile: OAuthProfile) {
         email,
         oauth: { provider: profile.provider, providerId: profile.providerId },
       });
+      await getOrCreateSubscription(String(user._id));
     }
   }
 

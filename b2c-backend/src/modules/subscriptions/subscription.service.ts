@@ -3,14 +3,81 @@ import { User } from '../users/user.model';
 import { AppError } from '../../common/errors/AppError';
 import { logger } from '../../common/utils/logger';
 import { env } from '../../config/env';
+import { TRIAL_PERIOD_DAYS } from '../../config/constants';
 import { getBillingProvider } from './billing/stripe.provider';
 import type { BillingEvent, BillingProvider } from './billing/types';
+
+const TRIAL_MS = TRIAL_PERIOD_DAYS * 24 * 60 * 60 * 1000;
+
+function defaultTrialEndsAt(from = new Date()): Date {
+  return new Date(from.getTime() + TRIAL_MS);
+}
+
+export function isTrialActive(
+  sub: { trialEndsAt?: Date | null },
+  now = new Date(),
+): boolean {
+  return Boolean(sub.trialEndsAt && sub.trialEndsAt > now);
+}
+
+export function hasPlatformAccess(
+  sub: { tier: string; trialEndsAt?: Date | null },
+  now = new Date(),
+): boolean {
+  return sub.tier === 'premium' || isTrialActive(sub, now);
+}
+
+export function serializeSubscription(
+  sub: InstanceType<typeof Subscription>,
+  now = new Date(),
+) {
+  const json = sub.toJSON() as Record<string, unknown>;
+  const trialActive = isTrialActive(sub, now);
+  const platformAccess = hasPlatformAccess(sub, now);
+  const daysRemainingInTrial =
+    trialActive && sub.trialEndsAt
+      ? Math.max(0, Math.ceil((sub.trialEndsAt.getTime() - now.getTime()) / 86_400_000))
+      : 0;
+
+  return {
+    ...json,
+    trialActive,
+    platformAccess,
+    requiresPayment: !platformAccess,
+    daysRemainingInTrial,
+  };
+}
+
+async function backfillTrialEndsAt(
+  sub: InstanceType<typeof Subscription>,
+): Promise<InstanceType<typeof Subscription>> {
+  if (sub.trialEndsAt) return sub;
+  const user = await User.findById(sub.userId).select('createdAt');
+  sub.trialEndsAt = defaultTrialEndsAt(user?.createdAt ?? sub.createdAt ?? new Date());
+  await sub.save();
+  return sub;
+}
 
 // Every user has exactly one subscription record; free is the default.
 export async function getOrCreateSubscription(userId: string) {
   const existing = await Subscription.findOne({ userId });
-  if (existing) return existing;
-  return Subscription.create({ userId, tier: 'free', status: 'active' });
+  if (existing) return backfillTrialEndsAt(existing);
+  return Subscription.create({
+    userId,
+    tier: 'free',
+    status: 'active',
+    trialEndsAt: defaultTrialEndsAt(),
+  });
+}
+
+export async function assertPlatformAccess(userId: string, now = new Date()): Promise<void> {
+  const sub = await getOrCreateSubscription(userId);
+  if (!hasPlatformAccess(sub, now)) {
+    throw new AppError(
+      402,
+      `Your ${TRIAL_PERIOD_DAYS}-day free trial has ended. Subscribe to continue learning.`,
+    );
+  }
 }
 
 export async function createCheckout(

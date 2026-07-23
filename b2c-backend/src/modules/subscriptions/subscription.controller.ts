@@ -8,7 +8,7 @@ export async function getMySubscription(
 ): Promise<void> {
   try {
     const subscription = await service.getOrCreateSubscription(req.user!.id);
-    res.json({ subscription });
+    res.json({ subscription: service.serializeSubscription(subscription) });
   } catch (err) {
     next(err);
   }

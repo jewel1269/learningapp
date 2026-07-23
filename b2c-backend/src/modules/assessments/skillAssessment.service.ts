@@ -19,6 +19,7 @@ import type { ZodType } from 'zod';
 import { scoreToLevel, skillAssessmentLimitFor, FREE_SKILL_ASSESSMENT_LIMIT } from './skillAssessment.constants';
 import { gradeSubmission, type ShortAnswerJudge } from './grading.service';
 import type { SubmittedAnswer } from './assessment.schema';
+import { assertPlatformAccess } from '../subscriptions/subscription.service';
 
 export type SkillAssessmentGenerator = (input: {
   topicLabel: string;
@@ -174,6 +175,7 @@ export async function generateSkillAssessment(
   tier?: string | null,
   generate: SkillAssessmentGenerator = defaultGenerator,
 ) {
+  if (userId) await assertPlatformAccess(userId);
   await assertSkillAssessmentQuota(userId, input.guestSessionId, tier);
   const label = topicLabel(input.topic, input.customTopic);
   const generated = await generate({ topicLabel: label, userId });

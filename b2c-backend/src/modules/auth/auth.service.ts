@@ -10,6 +10,7 @@ import {
 } from './token.service';
 import { AppError } from '../../common/errors/AppError';
 import type { Role, Tier } from '../../common/types';
+import { getOrCreateSubscription } from '../subscriptions/subscription.service';
 
 const SALT_ROUNDS = 12;
 
@@ -40,6 +41,7 @@ export async function signup(input: { email: string; password: string }) {
   if (existing) throw new AppError(409, 'Email already registered');
   const passwordHash = await bcrypt.hash(input.password, SALT_ROUNDS);
   const user = await User.create({ email, passwordHash });
+  await getOrCreateSubscription(String(user._id));
   const tokens = await issueTokenPair({ userId: String(user._id), role: user.role, tier: user.tier });
   return { user, ...tokens };
 }

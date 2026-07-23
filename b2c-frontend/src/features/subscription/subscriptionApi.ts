@@ -6,6 +6,11 @@ export interface Subscription {
   status: 'active' | 'canceled' | 'past_due' | 'incomplete';
   currentPeriodEnd?: string | null;
   cancelAtPeriodEnd?: boolean;
+  trialEndsAt?: string | null;
+  trialActive?: boolean;
+  platformAccess?: boolean;
+  requiresPayment?: boolean;
+  daysRemainingInTrial?: number;
 }
 
 export function getMySubscription(): Promise<{ subscription: Subscription }> {

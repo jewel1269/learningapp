@@ -2,6 +2,9 @@ export const TIERS = ['free', 'premium'] as const;
 export const DOMAINS = ['programming', 'networking', 'cybersecurity', 'os', 'general'] as const;
 export const COURSE_STATUS = ['generating', 'ready', 'failed', 'archived', 'completed'] as const;
 
+/** New accounts get this many days of platform access before a paid subscription is required. */
+export const TRIAL_PERIOD_DAYS = 90;
+
 // Per-tier limits — PLACEHOLDER numbers, confirm with Yonatan (§0, §9).
 export const TIER_LIMITS = {
   free: {

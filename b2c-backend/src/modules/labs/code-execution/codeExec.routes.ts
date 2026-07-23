@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { authenticate } from '../../../middlewares/auth.middleware';
+import { requirePlatformAccess, requirePremium } from '../../../middlewares/entitlement.middleware';
 import { validate } from '../../../middlewares/validate.middleware';
 import { aiRateLimit } from '../../../middlewares/rateLimit.middleware';
 import * as controller from './codeExec.controller';
@@ -17,6 +18,12 @@ router.use(authenticate);
 
 // Untrusted code execution (§2.1). Burst-limited; per-day lab caps + sandbox
 // isolation are enforced inside executeCode.
-router.post('/execute', aiRateLimit, validate({ body: executeSchema }), controller.execute);
+router.post(
+  '/execute',
+  requirePlatformAccess,
+  aiRateLimit,
+  validate({ body: executeSchema }),
+  controller.execute,
+);
 
 export default router;

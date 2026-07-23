@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { authenticate } from '../../../middlewares/auth.middleware';
+import { requirePremium } from '../../../middlewares/entitlement.middleware';
 import { validate } from '../../../middlewares/validate.middleware';
 import * as controller from './soc.controller';
 
@@ -14,6 +15,11 @@ router.use(authenticate);
 
 router.get('/scenarios', controller.list);
 router.get('/scenario/:id', controller.getOne);
-router.post('/scenario/:id/submit', validate({ body: submitSchema }), controller.submit);
+router.post(
+  '/scenario/:id/submit',
+  requirePremium,
+  validate({ body: submitSchema }),
+  controller.submit,
+);
 
 export default router;
