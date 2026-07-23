@@ -35,9 +35,13 @@ export default function SkillAssessmentPage({ id }: { id: string }) {
 
   if (isError || !assessment) {
     return (
-      <Container className="max-w-[1240px] py-20 text-center">
-        <h1 className="text-2xl font-semibold text-ink">Assessment not found</h1>
-        <p className="mt-2 text-sm text-ink-2">This assessment may have expired or been removed.</p>
+      <Container className="max-w-[1240px] py-20">
+        <div className="mx-auto max-w-lg rounded-2xl border border-line bg-bg-elev p-10 text-center shadow-card">
+          <h1 className="text-2xl font-semibold text-ink">Assessment not found</h1>
+          <p className="mt-2 text-sm text-ink-2">
+            This assessment may have expired or been removed.
+          </p>
+        </div>
       </Container>
     );
   }

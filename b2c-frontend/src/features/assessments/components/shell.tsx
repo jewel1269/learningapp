@@ -5,16 +5,18 @@ import { ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/src/components/ui/skeleton';
 
 export function AssessmentShell({ children }: { children: React.ReactNode }) {
-  return <div className="mx-auto w-full max-w-[780px] p-4 sm:p-6 lg:p-8">{children}</div>;
+  return <div className="w-full px-4 py-6 sm:px-6 lg:px-8">{children}</div>;
 }
 
 export function AssessmentLoading() {
   return (
     <AssessmentShell>
-      <Skeleton className="h-4 w-40" />
-      <Skeleton className="mt-6 h-9 w-1/2" />
-      <Skeleton className="mt-8 h-40 w-full rounded-2xl" />
-      <Skeleton className="mt-4 h-40 w-full rounded-2xl" />
+      <Skeleton className="h-4 w-36" />
+      <Skeleton className="mt-8 h-8 w-64" />
+      <Skeleton className="mt-3 h-4 w-40" />
+      <Skeleton className="mt-10 h-px w-full" />
+      <Skeleton className="mt-8 h-24 w-full" />
+      <Skeleton className="mt-8 h-24 w-full" />
     </AssessmentShell>
   );
 }
@@ -32,12 +34,12 @@ export function AssessmentError({
     <AssessmentShell>
       <Link
         href={backHref}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-primary"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-2 hover:text-primary"
       >
         <ArrowLeft className="size-4" /> {backLabel}
       </Link>
-      <div className="mt-6 rounded-2xl border border-line bg-bg-elev p-10 text-center">
-        <h1 className="text-xl font-bold">{label}</h1>
+      <div className="mt-8 border border-line bg-bg-elev px-6 py-10 text-center">
+        <h1 className="text-lg font-semibold text-ink">{label}</h1>
         <p className="mt-2 text-sm text-ink-2">It may have been removed, or the link is wrong.</p>
       </div>
     </AssessmentShell>

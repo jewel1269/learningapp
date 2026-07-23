@@ -1,18 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Loader2, RefreshCw, XCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import type { AssessmentQuestion, AssessmentSubmission } from '@/src/domain/assessment';
+import { cn } from '@/src/lib/utils';
 
-function scoreTone(score: number): { text: string; ring: string; label: string } {
-  if (score >= 70) return { text: 'text-good', ring: 'border-good/40 bg-good-soft', label: 'Passed' };
-  if (score >= 40)
-    return { text: 'text-warn', ring: 'border-warn/40 bg-warn-soft', label: 'Almost there' };
-  return { text: 'text-bad', ring: 'border-bad/40 bg-bad-soft', label: 'Keep practicing' };
+function scoreClass(score: number): string {
+  if (score >= 70) return 'text-good';
+  if (score >= 40) return 'text-warn';
+  return 'text-bad';
 }
 
 export function ResultSummary({
+  title,
+  eyebrow = 'Assessment',
   questions,
   submission,
   answers,
@@ -21,6 +23,8 @@ export function ResultSummary({
   onRetake,
   retaking,
 }: {
+  title: string;
+  eyebrow?: string;
   questions: AssessmentQuestion[];
   submission: AssessmentSubmission;
   answers: Record<number, string>;
@@ -29,67 +33,89 @@ export function ResultSummary({
   onRetake?: () => void;
   retaking?: boolean;
 }) {
-  const tone = scoreTone(submission.score);
   const results = [...submission.results].sort((a, b) => a.questionIndex - b.questionIndex);
   const correctCount = results.filter((r) => r.correct).length;
 
   return (
-    <div>
-      <div className={`rounded-2xl border p-6 text-center ${tone.ring}`}>
-        <div className={`text-5xl font-bold tracking-tight ${tone.text}`}>{submission.score}%</div>
-        <div className={`mt-1 text-sm font-semibold ${tone.text}`}>{tone.label}</div>
-        <p className="mt-1 text-sm text-ink-2">
-          {correctCount} of {results.length} correct
-        </p>
-      </div>
+    <div className="w-full">
+      <Link
+        href={backHref}
+        className="inline-flex items-center gap-1.5 text-sm text-ink-2 transition hover:text-primary"
+      >
+        <ArrowLeft className="size-4" /> {backLabel}
+      </Link>
 
-      <div className="mt-6 flex flex-col gap-4">
+      <header className="mt-6 border-b border-line pb-6">
+        <p className="text-xs font-medium uppercase tracking-widest text-ink-3">{eyebrow} result</p>
+        <h1 className="mt-2 text-2xl font-semibold text-ink">{title}</h1>
+        <div className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <p className={cn('text-4xl font-semibold tabular-nums', scoreClass(submission.score))}>
+            {submission.score}%
+          </p>
+          <p className="text-sm text-ink-2">
+            {correctCount} of {results.length} correct
+          </p>
+        </div>
+      </header>
+
+      <div className="mt-8 divide-y divide-line border-y border-line">
         {results.map((r) => {
           const q = questions[r.questionIndex];
           const given = (answers[r.questionIndex] ?? '').trim();
           return (
-            <div
-              key={r.questionIndex}
-              className="rounded-2xl border border-line bg-bg-elev p-5 shadow-soft"
-            >
-              <div className="flex items-start gap-3">
-                {r.correct ? (
-                  <CheckCircle2 className="mt-0.5 size-5 flex-none text-good" />
-                ) : (
-                  <XCircle className="mt-0.5 size-5 flex-none text-bad" />
-                )}
-                <div className="flex-1">
-                  <p className="font-medium text-ink">
-                    {r.questionIndex + 1}. {q?.question ?? 'Question'}
-                  </p>
-                  <p className="mt-2 text-sm text-ink-2">
-                    <span className="text-ink-3">Your answer:</span> {given || '—'}
-                  </p>
-                  {!r.correct && (
-                    <p className="mt-1 text-sm text-good">
-                      <span className="text-ink-3">Correct answer:</span> {r.correctAnswer}
-                    </p>
+            <section key={r.questionIndex} className="py-6 first:pt-0 last:pb-0">
+              <div className="flex items-start justify-between gap-4">
+                <p className="text-xs font-medium uppercase tracking-widest text-ink-3">
+                  Question {r.questionIndex + 1}
+                </p>
+                <span
+                  className={cn(
+                    'text-xs font-medium uppercase tracking-wide',
+                    r.correct ? 'text-good' : 'text-bad',
                   )}
-                  {r.feedback && <p className="mt-2 text-sm italic text-ink-3">{r.feedback}</p>}
-                </div>
+                >
+                  {r.correct ? 'Correct' : 'Incorrect'}
+                </span>
               </div>
-            </div>
+              <p className="mt-2 text-base font-medium leading-7 text-ink">
+                {q?.question ?? 'Question'}
+              </p>
+              <dl className="mt-4 space-y-2 border border-line bg-bg-soft px-4 py-3 text-sm">
+                <div>
+                  <dt className="inline font-medium text-ink">Your answer: </dt>
+                  <dd className="inline text-ink-2">{given || '—'}</dd>
+                </div>
+                {!r.correct ? (
+                  <div>
+                    <dt className="inline font-medium text-ink">Correct answer: </dt>
+                    <dd className="inline text-ink-2">{r.correctAnswer}</dd>
+                  </div>
+                ) : null}
+                {r.feedback ? (
+                  <div>
+                    <dt className="font-medium text-ink">Feedback</dt>
+                    <dd className="mt-1 text-ink-3">{r.feedback}</dd>
+                  </div>
+                ) : null}
+              </dl>
+            </section>
           );
         })}
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6">
+      <div className="mt-8 flex flex-wrap gap-3 border-t border-line pt-6">
         <Link href={backHref}>
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="size-4" /> {backLabel}
-          </Button>
+          <Button variant="outline">{backLabel}</Button>
         </Link>
-        {onRetake && (
-          <Button variant="soft" onClick={onRetake} disabled={retaking}>
+        <Link href="/quizzes">
+          <Button variant="soft">Quiz history</Button>
+        </Link>
+        {onRetake ? (
+          <Button onClick={onRetake} disabled={retaking}>
             {retaking ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
-            Try another
+            Try another quiz
           </Button>
-        )}
+        ) : null}
       </div>
     </div>
   );

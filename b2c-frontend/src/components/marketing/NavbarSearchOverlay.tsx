@@ -74,7 +74,7 @@ export function NavbarSearchOverlay({ open, onClose }: NavbarSearchOverlayProps)
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search courses, categories, or pages…"
-              className="h-14 flex-1 bg-white px-4 text-[15px] text-ink outline-none placeholder:text-ink-2"
+              className="h-14 flex-1 bg-bg-elev px-4 text-[15px] text-ink outline-none placeholder:text-ink-2"
               autoComplete="off"
             />
           </div>
@@ -89,7 +89,7 @@ export function NavbarSearchOverlay({ open, onClose }: NavbarSearchOverlayProps)
         </form>
 
         {trimmedQuery && results.length > 0 ? (
-          <ul className="mx-auto mt-3 w-full max-w-[920px] overflow-hidden rounded-xl border border-white/20 bg-white/95 shadow-lg">
+          <ul className="mx-auto mt-3 w-full max-w-[920px] overflow-hidden rounded-xl border border-line/70 bg-bg-elev/95 shadow-lg">
             {results.map((item, index) => (
               <li key={item.id} className="border-b border-line/70 last:border-b-0">
                 <button

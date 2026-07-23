@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ArrowRight,
-  BookOpen,
   Check,
   CheckCircle2,
   ClipboardList,
@@ -23,16 +22,11 @@ import { Badge } from '@/src/components/ui/badge';
 import { Button } from '@/src/components/ui/button';
 import { Skeleton } from '@/src/components/ui/skeleton';
 import { ApiError } from '@/src/infrastructure/apiClient';
-import type { LessonContent } from '@/src/features/lessons/lessonsApi';
+import { LessonContentBody } from '@/src/features/lessons/components/LessonContentBody';
 
 function formatGenerationError(err: unknown, fallback: string): string {
   if (err instanceof ApiError) return err.message;
   return fallback;
-}
-
-function lessonText(content: LessonContent | null | undefined): string {
-  if (content && typeof content.summary === 'string') return content.summary.trim();
-  return '';
 }
 
 function prettyKey(key: string): string {
@@ -102,8 +96,6 @@ export function LessonView({ lessonId }: { lessonId: string }) {
 
   const { lesson, progress } = lessonQ.data;
   const isCompleted = progress?.status === 'completed';
-  const body = lessonText(lesson.content);
-  const paragraphs = body ? body.split(/\n{2,}/).filter(Boolean) : [];
   // The complete mutation lives on this component, which App Router reuses across
   // param changes — so scope its success/error to the lesson it actually ran for.
   const justCompleted =
@@ -173,23 +165,19 @@ export function LessonView({ lessonId }: { lessonId: string }) {
       )}
 
       <article className="mt-8">
-        {paragraphs.length > 0 ? (
-          <div className="flex flex-col gap-4 text-[15px] leading-relaxed text-ink-2">
-            {paragraphs.map((p, i) => (
-              <p key={i} className="whitespace-pre-line">
-                {p}
-              </p>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-dashed border-line-2 bg-bg-soft p-8 text-center text-sm text-ink-2">
-            <BookOpen className="mx-auto mb-2 size-6 text-ink-3" />
-            This lesson doesn&rsquo;t have written content yet.
-          </div>
-        )}
+        <LessonContentBody
+          content={lesson.content}
+          emptyMessage="This lesson doesn't have written content yet."
+        />
       </article>
 
-      <div className="mt-8 rounded-2xl border border-line bg-bg-soft p-5">
+      <div className="mt-10 border-t border-line pt-8">
+        <p className="text-sm font-medium text-ink-2">
+          Finished reading? Optionally test your understanding or practice hands-on.
+        </p>
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-line bg-bg-soft p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="font-semibold text-ink">Test yourself</h3>

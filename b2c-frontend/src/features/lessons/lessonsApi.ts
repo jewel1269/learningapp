@@ -2,10 +2,25 @@ import { apiClient } from '@/src/infrastructure/apiClient';
 import type { Lesson } from '@/src/domain/course';
 import type { LessonProgress } from '@/src/domain/progress';
 
-// The backend stores lesson content as an AI-generated `{ summary }` block today
-// (see course.service.ts). Kept loose so richer blocks don't break the client.
+export type LessonVisualType = 'diagram' | 'timeline' | 'comparison' | 'flowchart' | 'infographic';
+
+export interface LessonVisual {
+  type: LessonVisualType;
+  title: string;
+  description: string;
+  elements?: string[];
+}
+
+export interface LessonSection {
+  title: string;
+  body: string;
+  visual?: LessonVisual;
+}
+
 export interface LessonContent {
   summary?: string;
+  sections?: LessonSection[];
+  keyPoints?: string[];
   [key: string]: unknown;
 }
 

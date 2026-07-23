@@ -17,6 +17,7 @@ import {
 } from '../src/jobs/queue';
 import { redis } from '../src/config/redis';
 import type { GeneratedCourse } from '../src/modules/courses/course.generator';
+import type { GeneratedLessonContent } from '../src/modules/courses/lesson.generator';
 
 const TEST_DB = 'mongodb://127.0.0.1:27017/b2c_test_courses';
 const config = { category: 'Cybersecurity', topics: ['fundamentals'], level: 'beginner' as const };
@@ -40,6 +41,57 @@ const fakeTree: GeneratedCourse = {
   ],
 };
 const fakeGenerate = async (): Promise<GeneratedCourse> => fakeTree;
+
+const longBody = (topic: string) =>
+  [
+    `${topic} is an important concept in this module. This section explains what it means in simple terms and why learners should care about it.`,
+    'We break the idea into smaller parts so you can follow along even if you are new to the subject. Each part builds on the previous one.',
+    'A practical example helps connect theory to real situations. Think about how this idea appears in everyday tools, workflows, or decisions.',
+    'Before moving on, review the main terms introduced here and make sure you can explain them in your own words.',
+  ].join('\n\n');
+
+const fakeLessonContent = async (input: {
+  lessonTitle: string;
+  lessonSummary: string;
+}): Promise<GeneratedLessonContent> => ({
+  summary: `${input.lessonSummary} This lesson walks through the topic step by step so you can read, understand, and then practice with a quiz or exercise.`,
+  sections: [
+    {
+      title: 'Introduction',
+      body: longBody(`Introduction to ${input.lessonTitle}`),
+      visual: {
+        type: 'diagram',
+        title: `${input.lessonTitle} at a glance`,
+        description: 'A simple diagram showing the main parts of the topic and how they connect.',
+        elements: ['Core idea', 'Supporting concepts', 'Real-world use'],
+      },
+    },
+    {
+      title: 'Core concepts',
+      body: longBody(`Core concepts of ${input.lessonTitle}`),
+      visual: {
+        type: 'comparison',
+        title: 'Before vs after understanding',
+        description: 'Compare how beginners and informed learners think about this topic.',
+        elements: ['Common misconception', 'Correct mental model'],
+      },
+    },
+    {
+      title: 'How it works',
+      body: longBody(`How ${input.lessonTitle} works in practice`),
+    },
+    {
+      title: 'Practical application',
+      body: longBody(`Applying ${input.lessonTitle} safely and effectively`),
+    },
+  ],
+  keyPoints: [
+    'Understand the fundamentals',
+    'Recognize common patterns',
+    'Apply the concept safely',
+    'Review examples before the quiz',
+  ],
+});
 
 async function signup(email = 'learner@example.com') {
   const res = await request(app).post('/auth/signup').send({ email, password: 'supersecret1' });
@@ -128,7 +180,7 @@ describe('runCourseGeneration (worker logic)', () => {
   it('builds the tree, persists modules/lessons, and flips status to ready', async () => {
     const { token, userId } = await signup();
     const course = await generatingCourse(userId);
-    await runCourseGeneration(String(course._id), fakeGenerate);
+    await runCourseGeneration(String(course._id), fakeGenerate, fakeLessonContent);
 
     const reloaded = await Course.findById(course._id);
     expect(reloaded!.status).toBe('ready');
@@ -136,6 +188,15 @@ describe('runCourseGeneration (worker logic)', () => {
     expect(reloaded!.moduleOrder).toHaveLength(2);
     expect(await Module.countDocuments({ courseId: course._id })).toBe(2);
     expect(await Lesson.countDocuments()).toBe(3);
+
+    const firstLesson = await Lesson.findOne({ title: 'CIA Triad' });
+    expect(firstLesson?.content).toMatchObject({
+      summary: expect.any(String),
+      sections: expect.arrayContaining([
+        expect.objectContaining({ title: expect.any(String), body: expect.any(String) }),
+      ]),
+      keyPoints: expect.any(Array),
+    });
 
     const struct = await request(app)
       .get(`/courses/${course._id}/structure`)
@@ -166,7 +227,7 @@ describe('runCourseGeneration (worker logic)', () => {
   it('is a no-op when the course is not in generating status (idempotent)', async () => {
     const { userId } = await signup();
     const course = await generatingCourse(userId, { status: 'ready' });
-    await runCourseGeneration(String(course._id), fakeGenerate);
+    await runCourseGeneration(String(course._id), fakeGenerate, fakeLessonContent);
     expect(await Module.countDocuments({ courseId: course._id })).toBe(0);
   });
 
@@ -202,7 +263,7 @@ describe('full async flow (BullMQ)', () => {
     const worker = new Worker(
       QUEUE_NAMES.courseGeneration,
       async (job: { data: { courseId: string } }) => {
-        await runCourseGeneration(job.data.courseId, fakeGenerate);
+        await runCourseGeneration(job.data.courseId, fakeGenerate, fakeLessonContent);
       },
       { connection: redisConnectionOptions() },
     );
@@ -217,8 +278,8 @@ describe('full async flow (BullMQ)', () => {
       const id = create.body.course.id;
 
       let status = 'generating';
-      for (let i = 0; i < 80 && status !== 'ready'; i += 1) {
-        await new Promise((r) => setTimeout(r, 50));
+      for (let i = 0; i < 160 && status !== 'ready'; i += 1) {
+        await new Promise((r) => setTimeout(r, 100));
         const poll = await request(app).get(`/courses/${id}`).set('Authorization', `Bearer ${token}`);
         status = poll.body.course.status;
       }
@@ -231,5 +292,5 @@ describe('full async flow (BullMQ)', () => {
     } finally {
       await worker.close();
     }
-  }, 20000);
+  }, 30000);
 });

@@ -25,6 +25,8 @@ export function ExamRunner({ examId }: { examId: string }) {
   return (
     <AssessmentShell>
       <AssessmentView
+        eyebrow={exam.scope === 'course' ? 'Course exam' : 'Module exam'}
+        submitLabel="Submit exam"
         title={exam.scope === 'course' ? 'Course exam' : 'Module exam'}
         subtitle="Answer every question, then submit for grading."
         questions={exam.questions}

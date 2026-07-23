@@ -104,12 +104,14 @@ export const COURSES: {
   id: string;
   title: string;
   price: number;
+  originalPrice: number;
   rating: number;
   reviews: number;
   instructor: string;
   experience: string;
   level: string;
   lessons: number;
+  students: number;
   duration: string;
   category: Exclude<CourseCategory, 'All Categories'>;
   image: string;
@@ -119,12 +121,14 @@ export const COURSES: {
     id: '1',
     title: "Getting Started with Computers and Beginner's Guide to Basic Skills",
     price: 240,
+    originalPrice: 320,
     rating: 4.5,
     reviews: 129,
     instructor: 'Sarah Alison',
     experience: '10+ Years Experience',
     level: 'Beginner',
     lessons: 45,
+    students: 50,
     duration: '620h, 55min',
     category: 'Programming',
     image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop',
@@ -133,13 +137,15 @@ export const COURSES: {
   {
     id: '2',
     title: 'Cooking Made Easy: Essential Skills for Everyday Meals',
-    price: 120,
+    price: 9,
+    originalPrice: 20,
     rating: 4.5,
     reviews: 129,
     instructor: 'Mitchel March',
     experience: '8+ Years Experience',
     level: 'Advance',
-    lessons: 120,
+    lessons: 20,
+    students: 50,
     duration: '12h, 55min',
     category: 'Design',
     image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&h=400&fit=crop',
@@ -147,14 +153,16 @@ export const COURSES: {
   },
   {
     id: '3',
-    title: 'Graphic Design Basics: Learn the Foundations of Visual',
-    price: 640,
+    title: 'Design Thinking Researching for Better UX',
+    price: 9,
+    originalPrice: 20,
     rating: 4.5,
     reviews: 129,
     instructor: 'Mr. Harry',
     experience: '12+ Years Experience',
     level: 'Entry Level',
-    lessons: 45,
+    lessons: 20,
+    students: 50,
     duration: '620h, 55min',
     category: 'Design',
     image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
@@ -164,12 +172,14 @@ export const COURSES: {
     id: '4',
     title: 'Photography for Everyone: How to Capture Stunning Photos with Ease',
     price: 350,
+    originalPrice: 420,
     rating: 4.5,
     reviews: 129,
     instructor: 'Alisa Olivia',
     experience: '6+ Years Experience',
     level: 'Advance',
-    lessons: 80,
+    lessons: 20,
+    students: 50,
     duration: '156h, 55min',
     category: 'Design',
     image: 'https://images.unsplash.com/photo-1452587925148-ce544e77ae70?w=600&h=400&fit=crop',
@@ -179,12 +189,14 @@ export const COURSES: {
     id: '5',
     title: 'Writing Made Simple: From Ideas to Finished Pieces for All Levels',
     price: 150,
+    originalPrice: 199,
     rating: 4.5,
     reviews: 129,
     instructor: 'Jordan Walk',
     experience: '9+ Years Experience',
     level: 'Medium',
-    lessons: 45,
+    lessons: 20,
+    students: 50,
     duration: '326h, 55min',
     category: 'Marketing',
     image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&h=400&fit=crop',
@@ -194,12 +206,14 @@ export const COURSES: {
     id: '6',
     title: "A Beginner's Guide to Building Your Online Presence",
     price: 290,
+    originalPrice: 360,
     rating: 4.5,
     reviews: 129,
     instructor: 'Aman Ellison',
     experience: '7+ Years Experience',
     level: 'Beginner',
-    lessons: 45,
+    lessons: 20,
+    students: 50,
     duration: '620h, 55min',
     category: 'Marketing',
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop',

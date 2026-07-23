@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Navbar } from '@/src/components/marketing/Navbar';
 import { Footer } from '@/src/components/marketing/Footer';
 import { Pricing } from '@/src/components/marketing/Pricing';
+import { MarketingPageShell } from '@/src/components/marketing/MarketingPageShell';
 
 export const metadata: Metadata = {
   title: 'Pricing | AIStudy',
@@ -11,12 +12,12 @@ export const metadata: Metadata = {
 
 export default function PricingPage() {
   return (
-    <div className="font-sans text-[#0F172A]">
+    <MarketingPageShell>
       <Navbar />
       <main>
         <Pricing fullPage />
       </main>
       <Footer />
-    </div>
+    </MarketingPageShell>
   );
 }

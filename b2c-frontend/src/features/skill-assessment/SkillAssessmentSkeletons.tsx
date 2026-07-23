@@ -9,7 +9,7 @@ function AssessmentPageSkeletonShell({ children }: { children: React.ReactNode }
 
 function AssessmentCardSkeleton() {
   return (
-    <div className="rounded-3xl border border-line/80 bg-white p-6 shadow-[0_12px_40px_rgba(15,23,42,0.05)]">
+    <div className="rounded-3xl border border-line/80 bg-bg-elev p-6 shadow-card">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 space-y-3">
           <Skeleton className="h-3 w-24" />
@@ -28,7 +28,7 @@ function AssessmentCardSkeleton() {
 
 function QuestionCardSkeleton() {
   return (
-    <div className="rounded-3xl border border-line/80 bg-white p-6 shadow-[0_12px_40px_rgba(15,23,42,0.05)] sm:p-7">
+    <div className="rounded-3xl border border-line/80 bg-bg-elev p-6 shadow-card sm:p-7">
       <div className="flex items-start gap-4">
         <Skeleton className="size-11 shrink-0 rounded-2xl" />
         <div className="flex-1 space-y-3">
@@ -51,7 +51,7 @@ export function AssessmentsListSkeleton() {
     <AssessmentPageSkeletonShell>
       <div className="flex flex-1 flex-col pb-16 pt-8 lg:pt-12">
         <Container className="flex max-w-[1240px] flex-1 flex-col">
-          <div className="overflow-hidden rounded-3xl border border-line/80 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
+          <div className="overflow-hidden rounded-3xl border border-line/80 bg-bg-elev shadow-lift">
             <div className="border-b border-line/70 px-6 py-6 sm:px-8 sm:py-8">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-2xl space-y-4">
@@ -84,7 +84,7 @@ export function AssessmentTakeSkeleton() {
     <AssessmentPageSkeletonShell>
       <div className="flex flex-1 flex-col pb-32 pt-8 lg:pt-12">
         <Container className="flex max-w-[1240px] flex-1 flex-col">
-          <div className="overflow-hidden rounded-3xl border border-line/80 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
+          <div className="overflow-hidden rounded-3xl border border-line/80 bg-bg-elev shadow-lift">
             <div className="border-b border-line/70 px-6 py-6 sm:px-8 sm:py-8">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-3xl space-y-4">
@@ -116,7 +116,7 @@ export function AssessmentTakeSkeleton() {
           </div>
         </Container>
 
-        <div className="fixed inset-x-0 bottom-0 z-[80] border-t border-line/80 bg-white/90 backdrop-blur-md">
+        <div className="fixed inset-x-0 bottom-0 z-[80] border-t border-line/80 bg-bg-elev/90 backdrop-blur-md">
           <Container className="max-w-[1240px]">
             <div className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
@@ -143,7 +143,7 @@ export function AssessmentResultSkeleton() {
     <AssessmentPageSkeletonShell>
       <div className="flex flex-1 flex-col pb-16 pt-8 lg:pt-12">
         <Container className="flex max-w-[1240px] flex-1 flex-col">
-          <div className="overflow-hidden rounded-3xl border border-line/80 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
+          <div className="overflow-hidden rounded-3xl border border-line/80 bg-bg-elev shadow-lift">
             <div className="px-6 py-12 text-center sm:px-10 sm:py-14">
               <Skeleton className="mx-auto size-16 rounded-3xl" />
               <Skeleton className="mx-auto mt-5 h-4 w-32" />
@@ -166,7 +166,7 @@ export function AssessmentResultSkeleton() {
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="rounded-3xl border border-line/80 bg-white p-6 shadow-[0_12px_40px_rgba(15,23,42,0.05)]"
+                  className="rounded-3xl border border-line/80 bg-bg-elev p-6 shadow-card"
                 >
                   <div className="flex gap-4">
                     <Skeleton className="size-11 shrink-0 rounded-2xl" />

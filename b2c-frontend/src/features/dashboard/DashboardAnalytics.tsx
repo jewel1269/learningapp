@@ -20,11 +20,26 @@ import { Skeleton } from '@/src/components/ui/skeleton';
 import { Avatar } from '@/src/components/ui/avatar';
 import { useMyExams, useMyQuizzes } from '@/src/features/assessments/useAssessments';
 import { useTranslation } from '@/src/i18n';
+import { useTheme } from '@/src/providers';
 import { cn } from '@/src/lib/utils';
 
 type ActivityItem =
   | { kind: 'quiz'; item: QuizHistoryItem }
   | { kind: 'exam'; item: ExamHistoryItem };
+
+function useChartPalette() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  return {
+    grid: isDark ? '#2B3648' : '#E2E8F0',
+    tick: isDark ? '#778396' : '#94A3B8',
+    progress: isDark ? '#22D3EE' : '#007F8E',
+    target: isDark ? '#67E8F9' : '#009DAF',
+    bar: isDark ? '#0891B2' : '#007F8E',
+    average: isDark ? '#FB923C' : '#F97316',
+  };
+}
 
 function buildActivity(quizzes: QuizHistoryItem[], exams: ExamHistoryItem[]): ActivityItem[] {
   return [
@@ -95,11 +110,11 @@ function ChartTooltip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-[#EBEBEB] bg-white px-3 py-2 shadow-sm">
-      <p className="mb-1 text-xs font-semibold text-[#3D2C1E]">{label}</p>
+    <div className="rounded-lg border border-line bg-bg-elev px-3 py-2 shadow-soft">
+      <p className="mb-1 text-xs font-semibold text-ink">{label}</p>
       {payload.map((entry) => (
-        <p key={entry.name} className="text-xs text-[#5C534A]">
-          {entry.name}: <span className="font-semibold text-[#3D2C1E]">{entry.value}</span>
+        <p key={entry.name} className="text-xs text-ink-2">
+          {entry.name}: <span className="font-semibold text-ink">{entry.value}</span>
         </p>
       ))}
     </div>
@@ -107,23 +122,24 @@ function ChartTooltip({
 }
 
 function CourseProgressChart({ courses }: { courses: Course[] }) {
+  const palette = useChartPalette();
   const data = buildCourseProgressData(courses);
 
   return (
-    <section className="rounded-xl border border-[#EBEBEB] bg-white p-5 shadow-sm">
-      <h3 className="text-lg font-bold text-[#3D2C1E]">Learning Performance</h3>
+    <section className="rounded-2xl border border-line bg-bg-elev p-5 shadow-soft">
+      <h3 className="text-lg font-bold text-ink">Learning Performance</h3>
       <div className="mt-5 h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke={palette.grid} vertical={false} />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 12, fill: '#9CA3AF' }}
+              tick={{ fontSize: 12, fill: palette.tick }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
-              tick={{ fontSize: 12, fill: '#9CA3AF' }}
+              tick={{ fontSize: 12, fill: palette.tick }}
               axisLine={false}
               tickLine={false}
               domain={[0, 100]}
@@ -133,7 +149,7 @@ function CourseProgressChart({ courses }: { courses: Course[] }) {
               type="monotone"
               dataKey="progress"
               name="Progress"
-              stroke="#14B8A6"
+              stroke={palette.progress}
               strokeWidth={2.5}
               dot={false}
             />
@@ -141,7 +157,7 @@ function CourseProgressChart({ courses }: { courses: Course[] }) {
               type="monotone"
               dataKey="target"
               name="Target"
-              stroke="#8B5CF6"
+              stroke={palette.target}
               strokeWidth={2.5}
               dot={false}
             />
@@ -159,31 +175,32 @@ function LearningOverviewChart({
   quizzes: QuizHistoryItem[];
   exams: ExamHistoryItem[];
 }) {
+  const palette = useChartPalette();
   const data = buildMonthlyOverview(quizzes, exams);
 
   return (
-    <section className="rounded-xl border border-[#EBEBEB] bg-white p-5 shadow-sm">
-      <h3 className="text-lg font-bold text-[#3D2C1E]">Learning Overview</h3>
+    <section className="rounded-2xl border border-line bg-bg-elev p-5 shadow-soft">
+      <h3 className="text-lg font-bold text-ink">Learning Overview</h3>
       <div className="mt-5 h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke={palette.grid} vertical={false} />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 11, fill: '#9CA3AF' }}
+              tick={{ fontSize: 11, fill: palette.tick }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
               yAxisId="left"
-              tick={{ fontSize: 12, fill: '#9CA3AF' }}
+              tick={{ fontSize: 12, fill: palette.tick }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
               yAxisId="right"
               orientation="right"
-              tick={{ fontSize: 12, fill: '#9CA3AF' }}
+              tick={{ fontSize: 12, fill: palette.tick }}
               axisLine={false}
               tickLine={false}
               domain={[0, 100]}
@@ -193,7 +210,7 @@ function LearningOverviewChart({
               yAxisId="left"
               dataKey="attempts"
               name="Attempts"
-              fill="#6D4C41"
+              fill={palette.bar}
               radius={[4, 4, 0, 0]}
               barSize={16}
             />
@@ -202,7 +219,7 @@ function LearningOverviewChart({
               type="monotone"
               dataKey="average"
               name="Average score"
-              stroke="#EC4899"
+              stroke={palette.average}
               strokeWidth={2.5}
               dot={false}
             />
@@ -253,9 +270,9 @@ export function DashboardActivityTable() {
   const activity = buildActivity(quizzesQ.data ?? [], examsQ.data ?? []);
 
   return (
-    <section className="overflow-hidden rounded-xl border border-[#EBEBEB] bg-white shadow-sm">
+    <section className="overflow-hidden rounded-2xl border border-line bg-bg-elev shadow-soft">
       {(quizzesQ.isError || examsQ.isError) && (
-        <div className="flex justify-end border-b border-[#EBEBEB] px-5 py-3">
+        <div className="flex justify-end border-b border-line px-5 py-3">
           <Button
             variant="soft"
             size="sm"
@@ -270,12 +287,12 @@ export function DashboardActivityTable() {
       )}
 
       {activity.length === 0 ? (
-        <p className="px-5 py-10 text-center text-sm text-[#9CA3AF]">{t('dashboard.noActivity')}</p>
+        <p className="px-5 py-10 text-center text-sm text-ink-3">{t('dashboard.noActivity')}</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[680px] text-left text-sm">
             <thead>
-              <tr className="border-b border-[#EBEBEB] text-xs text-[#9CA3AF]">
+              <tr className="border-b border-line text-xs text-ink-3">
                 <th className="px-5 py-4 font-medium">Assessment</th>
                 <th className="px-5 py-4 font-medium">ID</th>
                 <th className="px-5 py-4 font-medium">Type</th>
@@ -290,21 +307,21 @@ export function DashboardActivityTable() {
                   entry.kind === 'quiz' ? entry.item.lessonTitle : entry.item.scopeTitle;
                 const label = entry.kind === 'quiz' ? 'Quiz' : 'Exam';
                 return (
-                  <tr key={`${entry.kind}-${entry.item.id}`} className="border-b border-[#F3F4F6]">
+                  <tr key={`${entry.kind}-${entry.item.id}`} className="border-b border-line">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <Avatar name={title} className="size-9 text-xs" />
-                        <span className="font-medium text-[#3D2C1E]">{title}</span>
+                        <span className="font-medium text-ink">{title}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-[#9CA3AF]">{shortId(entry.item.id)}</td>
-                    <td className="px-5 py-4 text-[#5C534A]">{label}</td>
-                    <td className="px-5 py-4 font-medium text-[#3D2C1E]">{entry.item.score}%</td>
-                    <td className="px-5 py-4 text-[#5C534A]">{scoreRank(entry.item.score)}</td>
+                    <td className="px-5 py-4 text-ink-3">{shortId(entry.item.id)}</td>
+                    <td className="px-5 py-4 text-ink-2">{label}</td>
+                    <td className="px-5 py-4 font-medium text-ink">{entry.item.score}%</td>
+                    <td className="px-5 py-4 text-ink-2">{scoreRank(entry.item.score)}</td>
                     <td className="px-5 py-4">
                       <button
                         type="button"
-                        className="grid size-8 place-items-center rounded-full border border-[#EBEBEB] text-[#9CA3AF] transition hover:bg-[#FAFAF8]"
+                        className="grid size-8 place-items-center rounded-full border border-line text-ink-3 transition hover:bg-bg-soft hover:text-primary"
                         aria-label="More actions"
                       >
                         <MoreHorizontal className="size-4" />
@@ -325,15 +342,15 @@ export function RecentCoursesPanel({ courses }: { courses: Course[] }) {
   const preview = courses.slice(0, 6);
 
   return (
-    <section className="h-full rounded-xl border border-[#EBEBEB] bg-white p-5 shadow-sm">
+    <section className="h-full rounded-2xl border border-line bg-bg-elev p-5 shadow-soft">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-lg font-bold text-[#3D2C1E]">Recent Courses</h3>
-          <p className="mt-1 text-sm text-[#9CA3AF]">You have {courses.length} courses</p>
+          <h3 className="text-lg font-bold text-ink">Recent Courses</h3>
+          <p className="mt-1 text-sm text-ink-3">You have {courses.length} courses</p>
         </div>
         <Link
           href="/create-course"
-          className="grid size-9 shrink-0 place-items-center rounded-full bg-[#6D4C41] text-white transition hover:bg-[#5D4037]"
+          className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-primary-ink transition hover:bg-primary-dark"
           aria-label="Create course"
         >
           <Plus className="size-4" />
@@ -344,16 +361,16 @@ export function RecentCoursesPanel({ courses }: { courses: Course[] }) {
         {preview.map((course) => (
           <div
             key={course.id}
-            className="flex items-center gap-3 border-b border-[#F3F4F6] py-4 last:border-b-0"
+            className="flex items-center gap-3 border-b border-line py-4 last:border-b-0"
           >
             <Avatar name={course.title} className="size-10 text-xs" />
             <div className="min-w-0 flex-1">
-              <p className="truncate font-medium text-[#3D2C1E]">{course.title}</p>
-              <p className="text-xs text-[#9CA3AF]">{course.category}</p>
+              <p className="truncate font-medium text-ink">{course.title}</p>
+              <p className="text-xs text-ink-3">{course.category}</p>
             </div>
             <Link
               href={`/courses/${course.id}`}
-              className="grid size-8 shrink-0 place-items-center rounded-full border border-[#EBEBEB] text-[#9CA3AF] transition hover:bg-[#FAFAF8] hover:text-[#5C534A]"
+              className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-ink-3 transition hover:bg-primary-soft hover:text-primary"
             >
               <ArrowRight className="size-4" />
             </Link>
@@ -386,13 +403,13 @@ export function StudySummaryCard({
   iconBg: string;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-[#EBEBEB] bg-white px-5 py-4 shadow-sm">
+    <div className="flex items-center gap-4 rounded-2xl border border-line bg-bg-elev px-5 py-4 shadow-soft">
       <div className={cn('grid size-[52px] shrink-0 place-items-center rounded-full', iconBg)}>
         <Icon className="size-5" strokeWidth={1.75} />
       </div>
       <div>
-        <p className="text-sm text-[#9CA3AF]">{label}</p>
-        <p className="text-[26px] font-bold leading-tight text-[#3D2C1E]">{value}</p>
+        <p className="text-sm text-ink-3">{label}</p>
+        <p className="text-[26px] font-bold leading-tight text-ink">{value}</p>
       </div>
     </div>
   );

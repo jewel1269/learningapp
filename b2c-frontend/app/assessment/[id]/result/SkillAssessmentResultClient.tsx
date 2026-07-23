@@ -85,26 +85,30 @@ function ResultContent({ id }: { id: string }) {
 
   if (!assessment) {
     return (
-      <Container className="max-w-[1240px] py-20 text-center">
-        <h1 className="text-2xl font-semibold text-ink">Assessment not found</h1>
+      <Container className="max-w-[1240px] py-20">
+        <div className="mx-auto max-w-lg rounded-2xl border border-line bg-bg-elev p-10 text-center shadow-card">
+          <h1 className="text-2xl font-semibold text-ink">Assessment not found</h1>
+        </div>
       </Container>
     );
   }
 
   if (resultError || !submission) {
     return (
-      <Container className="max-w-[1240px] py-20 text-center">
-        <h1 className="text-2xl font-semibold text-ink">Results not available</h1>
-        <p className="mt-2 text-sm text-ink-2">
-          Complete the assessment and sign in to view your private results.
-        </p>
-        <button
-          type="button"
-          onClick={() => router.push(`/assessment/${id}`)}
-          className="mt-4 text-sm font-medium text-primary hover:underline"
-        >
-          Go to assessment
-        </button>
+      <Container className="max-w-[1240px] py-20">
+        <div className="mx-auto max-w-lg rounded-2xl border border-line bg-bg-elev p-10 text-center shadow-card">
+          <h1 className="text-2xl font-semibold text-ink">Results not available</h1>
+          <p className="mt-2 text-sm text-ink-2">
+            Complete the assessment and sign in to view your private results.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push(`/assessment/${id}`)}
+            className="mt-6 inline-flex h-11 items-center rounded-xl bg-primary px-6 text-sm font-semibold text-white hover:bg-primary-dark"
+          >
+            Return to assessment
+          </button>
+        </div>
       </Container>
     );
   }

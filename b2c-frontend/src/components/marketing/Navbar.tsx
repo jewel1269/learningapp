@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Menu, Search, UserRound, X } from 'lucide-react';
 import { LanguageSelector } from '@/src/components/layout/LanguageSelector';
+import { ThemeToggle } from '@/src/components/ui/theme-toggle';
 import { NavbarAuthLinks, NavbarUserMenu } from '@/src/components/marketing/NavbarUserMenu';
 import { NavbarSearchOverlay } from '@/src/components/marketing/NavbarSearchOverlay';
 import { useAuthHydrated } from '@/src/features/auth/useAuthHydrated';
@@ -55,7 +56,7 @@ export function Navbar() {
     <>
       <NavbarSearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      <header className="sticky top-0 z-50 border-b border-line/50 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--primary-soft)_15%,transparent)_0%,rgba(255,255,255,0.72)_18%,rgba(255,255,255,0.72)_82%,color-mix(in_srgb,var(--primary-soft)_15%,transparent)_100%)] backdrop-blur-md backdrop-saturate-150">
+      <header className="sticky top-0 z-50 border-b border-line/50 bg-[var(--marketing-nav)] backdrop-blur-md backdrop-saturate-150">
         <Container className="flex h-[88px] items-center gap-6">
           <FiStudyLogo />
 
@@ -100,6 +101,10 @@ export function Navbar() {
 
             <NavDivider />
 
+            <ThemeToggle />
+
+            <NavDivider />
+
             {showUserMenu ? <NavbarUserMenu /> : <NavbarAuthLinks />}
           </div>
 
@@ -124,7 +129,7 @@ export function Navbar() {
         </Container>
 
         {mobileOpen ? (
-          <nav className="border-t border-line bg-white px-4 py-4 lg:hidden">
+          <nav className="border-t border-line bg-bg-elev px-4 py-4 lg:hidden">
             {NAV_LINKS.map((link) =>
               link.href.startsWith('/') ? (
                 <Link
@@ -156,8 +161,11 @@ export function Navbar() {
               Search courses, categories, pages…
             </button>
 
-            <div className="mt-5 space-y-4 border-t border-bg-soft pt-5">
-              <LanguageSelector />
+            <div className="mt-5 space-y-4 border-t border-line pt-5">
+              <div className="flex items-center justify-between gap-3">
+                <LanguageSelector />
+                <ThemeToggle />
+              </div>
               {showUserMenu ? (
                 <NavbarUserMenu compact />
               ) : (

@@ -7,6 +7,7 @@ import { AppError } from '../../common/errors/AppError';
 import { logger } from '../../common/utils/logger';
 import { courseGenerationQueue, jobPriority } from '../../jobs/queue';
 import { generateCourseTree, type CourseTreeGenerator } from './course.generator';
+import { generateLessonContent, type LessonContentGenerator } from './lesson.generator';
 
 export interface CreateCourseInput {
   category: string;
@@ -52,7 +53,6 @@ export async function createCourse(userId: string, input: CreateCourseInput) {
     { priority: jobPriority(user.tier as string) },
   );
 
-  console.log("Hello Jewel",course)
   return course;
 }
 
@@ -104,6 +104,7 @@ export async function getStructure(userId: string, courseId: string) {
 export async function runCourseGeneration(
   courseId: string,
   generate: CourseTreeGenerator = generateCourseTree,
+  generateContent: LessonContentGenerator = generateLessonContent,
 ): Promise<void> {
   const course = await Course.findById(courseId);
   if (!course || course.status !== 'generating') return;
@@ -132,11 +133,21 @@ export async function runCourseGeneration(
       const lessonIds: Types.ObjectId[] = [];
       for (let li = 0; li < m.lessons.length; li += 1) {
         const l = m.lessons[li];
+        const content = await generateContent({
+          courseTitle: tree.title,
+          moduleTitle: m.title,
+          lessonTitle: l.title,
+          lessonSummary: l.summary,
+          category: course.category as string,
+          level: course.level as 'beginner' | 'intermediate' | 'advanced',
+          visualsPreferred: prefs?.visualsPreferred ?? false,
+          userId: String(course.userId),
+        });
         const lesson = await Lesson.create({
           moduleId: mod._id,
           courseId: course._id,
           title: l.title,
-          content: { summary: l.summary },
+          content,
           order: li,
         });
         lessonIds.push(lesson._id);

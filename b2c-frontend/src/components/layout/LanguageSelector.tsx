@@ -86,8 +86,8 @@ export function LanguageSelector({ compact = false }: { compact?: boolean }) {
           'flex items-center gap-1.5 rounded-full text-sm font-medium transition-all duration-200',
           compact ? 'px-2 py-1.5' : 'gap-2 px-3 py-2',
           open
-            ? 'bg-[#F8F9FB] text-ink'
-            : 'text-ink-2 hover:bg-[#F8F9FB] hover:text-ink',
+            ? 'bg-bg-soft text-ink'
+            : 'text-ink-2 hover:bg-bg-soft hover:text-ink',
         )}
         aria-label="Select language"
         aria-expanded={open}
@@ -109,9 +109,9 @@ export function LanguageSelector({ compact = false }: { compact?: boolean }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute right-0 top-full z-50 mt-2 w-[240px] overflow-hidden rounded-2xl border border-[#F1F5F9] bg-white shadow-[0_20px_40px_-12px_rgba(15,23,42,0.12)]"
+            className="absolute right-0 top-full z-50 mt-2 w-[240px] overflow-hidden rounded-2xl border border-line bg-bg-elev shadow-[var(--shadow-elevated)]"
           >
-            <div className="border-b border-[#F1F5F9] p-2">
+            <div className="border-b border-line p-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
                 <input
@@ -120,7 +120,7 @@ export function LanguageSelector({ compact = false }: { compact?: boolean }) {
                   placeholder="Search language..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="h-9 w-full rounded-xl border-0 bg-[#F8F9FB] pl-9 pr-3 text-sm text-ink outline-none placeholder:text-ink-3 focus:bg-[#F1F3F5]"
+                  className="h-9 w-full rounded-xl border-0 bg-bg-soft pl-9 pr-3 text-sm text-ink outline-none placeholder:text-ink-3 focus:bg-bg-lav"
                 />
               </div>
             </div>
@@ -142,8 +142,8 @@ export function LanguageSelector({ compact = false }: { compact?: boolean }) {
                       className={cn(
                         'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-all duration-150',
                         isSelected
-                          ? 'bg-primary/[0.06] text-primary'
-                          : 'text-ink hover:bg-[#F8F9FB]',
+                          ? 'bg-primary-soft text-primary'
+                          : 'text-ink hover:bg-bg-soft',
                       )}
                     >
                       <span className="text-lg leading-none">{lang.flag}</span>

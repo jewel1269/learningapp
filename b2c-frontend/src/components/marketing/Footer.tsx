@@ -69,7 +69,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer id="contact" className="relative bg-white">
+    <footer id="contact" className="relative bg-bg-elev">
       {/* Contact bar */}
       {/* <section className="bg-secondary py-10">
         <Container>
@@ -104,7 +104,7 @@ export function Footer() {
       </section> */}
 
       {/* Main footer */}
-      <div className="relative overflow-hidden border-t border-line bg-[#FCFCFC]">
+      <div className="relative overflow-hidden border-t border-line bg-[var(--marketing-surface)]">
         <Container className="relative py-24 lg:py-[116px] lg:pb-[120px]">
           <div className="grid gap-12 lg:grid-cols-12">
             <div className="lg:col-span-4">
@@ -119,7 +119,7 @@ export function Footer() {
                     key={label}
                     href="#contact"
                     aria-label={label}
-                    className="grid size-10 place-items-center rounded-full border border-line bg-white text-ink-2 transition-colors hover:border-primary hover:bg-primary hover:text-white"
+                    className="grid size-10 place-items-center rounded-full border border-line bg-bg-elev text-ink-2 transition-colors hover:border-primary hover:bg-primary hover:text-white"
                   >
                     <Icon className="size-4" />
                   </Link>
@@ -168,7 +168,7 @@ export function Footer() {
           </div>
         </Container>
 
-        <div className="border-t border-dashed border-line bg-white">
+        <div className="border-t border-dashed border-line bg-bg-elev">
           <Container className="flex flex-col gap-6 py-8 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-base text-ink-2">
               Copyright © 2024{' '}

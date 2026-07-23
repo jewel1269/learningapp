@@ -26,12 +26,12 @@ const caveat = Caveat({
 function HeroDecorations() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="absolute -left-32 top-10 size-[420px] rounded-full bg-[#C4B5FD]/25 blur-[90px]" />
-      <div className="absolute -right-24 top-0 size-[480px] rounded-full bg-[#BFDBFE]/35 blur-[100px]" />
-      <div className="absolute bottom-0 left-[35%] size-[320px] rounded-full bg-[#FED7AA]/30 blur-[80px]" />
+      <div className="absolute -left-32 top-10 size-[420px] rounded-full bg-[#C4B5FD]/25 blur-[90px] dark:bg-[#6D28D9]/20" />
+      <div className="absolute -right-24 top-0 size-[480px] rounded-full bg-[#BFDBFE]/35 blur-[100px] dark:bg-[#0369A1]/20" />
+      <div className="absolute bottom-0 left-[35%] size-[320px] rounded-full bg-[#FED7AA]/30 blur-[80px] dark:bg-[#C2410C]/15" />
 
       <div
-        className="absolute left-[42%] top-[18%] h-[420px] w-[420px] -translate-x-1/2 opacity-[0.35]"
+        className="absolute left-[42%] top-[18%] h-[420px] w-[420px] -translate-x-1/2 opacity-[0.35] dark:opacity-[0.18]"
         style={{
           backgroundImage:
             'linear-gradient(to right, rgba(0,127,142,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,127,142,0.18) 1px, transparent 1px)',
@@ -117,7 +117,7 @@ function HeroCollage() {
             />
           </div>
 
-          <div className="relative rounded-[13px] bg-white p-3.5 shadow-[0_0_20px_rgba(190,190,190,0.38)]">
+          <div className="relative rounded-[13px] bg-[var(--marketing-card)] p-3.5 shadow-[var(--marketing-card-shadow)]">
             <div className="relative aspect-[16/9] overflow-hidden rounded-[9px]">
               <Image
                 src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=220&fit=crop"
@@ -176,7 +176,7 @@ function HeroCollage() {
               aria-hidden
               className="absolute -bottom-1.5 -right-1.5 top-1.5 left-1.5 -z-10 rounded-[45px] border-2 border-ink"
             />
-            <div className="flex items-center gap-[15px] rounded-[45px] bg-white px-5 py-[17px] shadow-[0_0_20px_rgba(0,0,0,0.1)]">
+            <div className="flex items-center gap-[15px] rounded-[45px] bg-[var(--marketing-card)] px-5 py-[17px] shadow-[var(--marketing-card-shadow-strong)]">
               <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#FEF3C7] text-[#F59E0B]">
                 <Lightbulb className="size-5" fill="#FEF3C7" />
               </span>
@@ -217,7 +217,7 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="relative overflow-hidden bg-[linear-gradient(282.57deg,#F1E4FF_0.89%,#F0FFF7_54.81%,#FFEBFF_100%)] pb-16 pt-8 lg:pb-20 lg:pt-24"
+      className="relative overflow-hidden bg-[var(--marketing-hero)] pb-16 pt-8 lg:pb-20 lg:pt-24"
     >
       <HeroDecorations />
 
@@ -294,7 +294,7 @@ export function Hero() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="hero-video-modal-title"
-            className="relative w-full max-w-[420px] rounded-[24px] bg-white p-8 text-center shadow-[var(--shadow-elevated)]"
+            className="relative w-full max-w-[420px] rounded-[24px] bg-bg-elev p-8 text-center shadow-[var(--shadow-elevated)]"
           >
             <button
               type="button"

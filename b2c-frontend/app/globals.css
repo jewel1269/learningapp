@@ -5,6 +5,7 @@
 
 /* ============ Design tokens — LMS Admin (light) ============ */
 :root {
+  color-scheme: light;
   --bg: #F8FAFC;
   --bg-soft: #F1F5F9;
   --bg-lav: #E2E8F0;
@@ -77,32 +78,48 @@
   --sidebar-active: rgba(0, 127, 142, 0.08);
   --sidebar-width: 270px;
   --sidebar-collapsed-width: 72px;
+
+  /* Marketing / landing */
+  --marketing-nav: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--primary-soft) 15%, transparent) 0%,
+    rgba(255, 255, 255, 0.72) 18%,
+    rgba(255, 255, 255, 0.72) 82%,
+    color-mix(in srgb, var(--primary-soft) 15%, transparent) 100%
+  );
+  --marketing-hero: linear-gradient(282.57deg, #f1e4ff 0.89%, #f0fff7 54.81%, #ffebff 100%);
+  --marketing-surface: #fcfcfc;
+  --marketing-card: #ffffff;
+  --marketing-card-shadow: 0 0 20px rgba(190, 190, 190, 0.38);
+  --marketing-card-shadow-strong: 0 0 20px rgba(15, 23, 42, 0.1);
 }
 
 /* ============ Design tokens — LMS Admin (dark) ============ */
 .dark {
-  --bg: #0B1120;
-  --bg-soft: #111827;
-  --bg-lav: #1E293B;
-  --bg-elev: #1E293B;
+  color-scheme: dark;
 
-  --ink: #F1F5F9;
-  --ink-2: #94A3B8;
-  --ink-3: #64748B;
+  --bg: #151C2C;
+  --bg-soft: #1B2434;
+  --bg-lav: #243044;
+  --bg-elev: #1F2937;
 
-  --line: #1E293B;
-  --line-2: #334155;
+  --ink: #E8EEF5;
+  --ink-2: #A8B3C4;
+  --ink-3: #778396;
+
+  --line: #2B3648;
+  --line-2: #384559;
 
   --primary: #22D3EE;
   --primary-2: #67E8F9;
-  --primary-soft: #083344;
+  --primary-soft: rgba(34, 211, 238, 0.12);
   --primary-dark: #0891B2;
-  --primary-deep: #042F35;
+  --primary-deep: #0E7490;
   --primary-ink: #0F172A;
 
   --secondary: #FB923C;
   --secondary-2: #F97316;
-  --secondary-soft: #431407;
+  --secondary-soft: rgba(251, 146, 60, 0.12);
   --secondary-ink: #FFFFFF;
 
   --accent: var(--secondary);
@@ -111,18 +128,18 @@
   --accent-ink: var(--secondary-ink);
 
   --good: #4ADE80;
-  --good-soft: #052E16;
+  --good-soft: rgba(74, 222, 128, 0.12);
   --bad: #F87171;
-  --bad-soft: #450A0A;
+  --bad-soft: rgba(248, 113, 113, 0.12);
   --warn: #FBBF24;
-  --warn-soft: #422006;
+  --warn-soft: rgba(251, 191, 36, 0.12);
 
-  --tint-blue: #0C1929;
-  --tint-mint: #052E1A;
-  --tint-peach: #2A1508;
-  --tint-pink: #2A0E1E;
-  --tint-lime: #1A2608;
-  --tint-lav: #1E1538;
+  --tint-blue: #152238;
+  --tint-mint: #132A22;
+  --tint-peach: #2A1A10;
+  --tint-pink: #2A1420;
+  --tint-lime: #1E2810;
+  --tint-lav: #221838;
 
   --kpi-primary-from: #0891B2;
   --kpi-primary-to: #22D3EE;
@@ -133,17 +150,31 @@
   --kpi-good-from: #16A34A;
   --kpi-good-to: #22C55E;
 
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-  --shadow-lift: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-  --shadow-elevated: 0 20px 40px -12px rgba(0, 0, 0, 0.6);
-  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.35);
+  --shadow-soft: 0 1px 3px rgba(15, 23, 42, 0.42), 0 1px 2px rgba(15, 23, 42, 0.32);
+  --shadow-card: 0 4px 6px -1px rgba(15, 23, 42, 0.45), 0 2px 4px -2px rgba(15, 23, 42, 0.32);
+  --shadow-lift: 0 10px 25px -5px rgba(15, 23, 42, 0.5), 0 8px 10px -6px rgba(15, 23, 42, 0.38);
+  --shadow-elevated: 0 20px 40px -12px rgba(15, 23, 42, 0.55);
+  --shadow-glass: 0 8px 32px rgba(8, 145, 178, 0.18);
+  --shadow-primary: 0 8px 20px rgba(34, 211, 238, 0.18);
 
-  --sidebar-bg: #111827;
-  --sidebar-border: #1E293B;
-  --sidebar-hover: #1E293B;
+  --sidebar-bg: #1B2434;
+  --sidebar-border: #2B3648;
+  --sidebar-hover: #243044;
   --sidebar-active: rgba(34, 211, 238, 0.12);
+
+  --marketing-nav: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--primary-soft) 20%, transparent) 0%,
+    rgba(21, 28, 44, 0.92) 18%,
+    rgba(21, 28, 44, 0.92) 82%,
+    color-mix(in srgb, var(--primary-soft) 20%, transparent) 100%
+  );
+  --marketing-hero: linear-gradient(282.57deg, #1a1528 0.89%, #152028 54.81%, #281528 100%);
+  --marketing-surface: var(--bg-soft);
+  --marketing-card: var(--bg-elev);
+  --marketing-card-shadow: 0 0 20px rgba(15, 23, 42, 0.45);
+  --marketing-card-shadow-strong: 0 0 20px rgba(15, 23, 42, 0.55);
 }
 
 /* ============ Map tokens to Tailwind ============ */
@@ -204,8 +235,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::selection {
-  background: var(--primary);
-  color: #ffffff;
+  background: color-mix(in srgb, var(--primary) 35%, transparent);
+  color: var(--ink);
 }
 
 /* ============ Scrollbar Styling ============ */

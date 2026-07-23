@@ -81,10 +81,10 @@ export function ProfileDropdown() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute right-0 top-full z-50 mt-2 w-[240px] overflow-hidden rounded-2xl border border-[#F1F5F9] bg-white shadow-[0_20px_40px_-12px_rgba(15,23,42,0.12)]"
+            className="absolute right-0 top-full z-50 mt-2 w-[240px] overflow-hidden rounded-2xl border border-line bg-bg-elev shadow-[var(--shadow-elevated)]"
           >
             {/* User info header */}
-            <div className="border-b border-[#F1F5F9] px-4 py-3.5">
+            <div className="border-b border-line px-4 py-3.5">
               <p className="text-sm font-semibold text-ink">
                 {user?.email?.split('@')[0] ?? 'Admin'}
               </p>
@@ -98,7 +98,7 @@ export function ProfileDropdown() {
                   key={item.label}
                   href={item.href ?? '#'}
                   onClick={() => setOpen(false)}
-                  className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink-2 transition-all duration-150 hover:bg-[#F8F9FB] hover:text-ink"
+                  className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink-2 transition-all duration-150 hover:bg-bg-soft hover:text-ink"
                 >
                   <item.icon className="size-4 shrink-0 text-ink-3 group-hover:text-ink-2" />
                   <span className="flex-1">{item.label}</span>
@@ -106,14 +106,14 @@ export function ProfileDropdown() {
                 </a>
               ))}
 
-              <div className="my-1.5 h-px bg-[#F1F5F9]" />
+              <div className="my-1.5 h-px bg-line" />
 
               <button
                 onClick={() => {
                   setOpen(false);
                   logout();
                 }}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#EF4444] transition-all duration-150 hover:bg-[#FEF2F2]"
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-bad transition-all duration-150 hover:bg-bad-soft"
               >
                 <LogOut className="size-4 shrink-0" />
                 <span>Logout</span>

@@ -30,9 +30,9 @@ function CategoryCard({
   iconColor,
 }: (typeof CATEGORIES)[number]) {
   return (
-    <article className="group rounded-lg bg-white p-5">
-      <div className="relative rounded-lg border border-line bg-[#FCFCFC] px-5 pb-5 pt-[77px] ">
-        <div className="absolute -left-5 top-5 z-10 grid size-20 -translate-y-1/2 place-items-center rounded-full border border-line bg-white">
+    <article className="group rounded-lg bg-bg-elev p-5">
+      <div className="relative rounded-lg border border-line bg-[var(--marketing-surface)] px-5 pb-5 pt-[77px] ">
+        <div className="absolute -left-5 top-5 z-10 grid size-20 -translate-y-1/2 place-items-center rounded-full border border-line bg-bg-elev">
           <span className={`grid size-14 place-items-center rounded-full ${iconBg}`}>
             <Icon className={`size-7 ${iconColor}`} strokeWidth={1.8} />
           </span>
@@ -62,7 +62,7 @@ function CategoryCard({
 
 export function Categories() {
   return (
-    <section id="categories" className="bg-[#FCFCFC] py-20 lg:py-[120px] lg:pb-24">
+    <section id="categories" className="bg-[var(--marketing-surface)] py-20 lg:py-[120px] lg:pb-24">
       <Container>
         <CategoriesHeading />
 

@@ -70,8 +70,8 @@ function PlanCard({
       className={cn(
         'relative flex flex-col rounded-[10px] px-7 py-9 sm:px-8 sm:py-10 border border-line/50',
         isFeatured
-          ? 'bg-[#1E293B] text-white shadow-[0_24px_60px_rgba(15,23,42,0.22)] lg:-mt-4 lg:mb-4 lg:scale-[1.03]'
-          : 'bg-[#F3F4F6] text-ink',
+          ? 'bg-[#1E293B] text-white shadow-[0_24px_60px_rgba(15,23,42,0.22)] lg:-mt-4 lg:mb-4 lg:scale-[1.03] dark:bg-[#243044] dark:shadow-[var(--shadow-elevated)]'
+          : 'bg-bg-soft text-ink',
       )}
     >
       {isFeatured ? (

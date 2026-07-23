@@ -1,3 +1,1 @@
-// onboarding feature barrel
-// TODO: implement
-export {};
+export { CreateCourseWizard } from './CreateCourseWizard';

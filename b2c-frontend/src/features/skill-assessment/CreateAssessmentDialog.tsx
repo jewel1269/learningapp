@@ -104,7 +104,7 @@ function StepProgress({ step }: { step: 1 | 2 }) {
                   'grid size-6 place-items-center rounded-full text-xs font-semibold',
                   done && 'bg-primary text-white',
                   active && !done && 'bg-primary text-white',
-                  !active && !done && 'border border-line-2 bg-white text-ink-3',
+                  !active && !done && 'border border-line-2 bg-bg-elev text-ink-3',
                 )}
               >
                 {done ? <Check className="size-3.5" strokeWidth={3} /> : n}
@@ -212,7 +212,7 @@ export function CreateAssessmentDialog({
       <button
         type="button"
         aria-label="Close"
-        className="absolute inset-0 bg-[#0F172A]/50 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-ink/50 backdrop-blur-[2px]"
         onClick={onClose}
       />
 
@@ -220,7 +220,7 @@ export function CreateAssessmentDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-assessment-title"
-        className="relative z-10 flex max-h-[94vh] w-full max-w-[920px] flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-[0_24px_80px_rgba(15,23,42,0.16)] sm:max-h-[90vh] sm:rounded-2xl"
+        className="relative z-10 flex max-h-[94vh] w-full max-w-[920px] flex-col overflow-hidden rounded-t-2xl border border-line bg-bg-elev shadow-elevated sm:max-h-[90vh] sm:rounded-2xl"
       >
         <div className="border-b border-line px-6 py-5 sm:px-8 sm:py-6">
           <div className="flex items-start justify-between gap-4">
@@ -287,7 +287,7 @@ export function CreateAssessmentDialog({
                           'flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-colors',
                           selected
                             ? 'border-primary bg-primary/[0.04]'
-                            : 'border-line bg-white hover:border-primary/30 hover:bg-bg-soft',
+                            : 'border-line bg-bg-elev hover:border-primary/30 hover:bg-bg-soft',
                         )}
                       >
                         <span
@@ -327,7 +327,7 @@ export function CreateAssessmentDialog({
                     value={customTopic}
                     onChange={(e) => setCustomTopic(e.target.value)}
                     placeholder="For example: Cloud computing, UI design, project management"
-                    className="h-12 w-full rounded-xl border border-line bg-white px-4 text-sm text-ink outline-none transition placeholder:text-ink-3 focus:border-primary focus:ring-2 focus:ring-primary/15"
+                    className="h-12 w-full rounded-xl border border-line bg-bg-elev px-4 text-sm text-ink outline-none transition placeholder:text-ink-3 focus:border-primary focus:ring-2 focus:ring-primary/15"
                   />
                   <p className="mt-2 text-xs text-ink-3">
                     Enter the topic you would like us to assess.
@@ -352,7 +352,7 @@ export function CreateAssessmentDialog({
                         'flex h-full flex-col rounded-xl border p-4 text-left transition-colors',
                         goal === g.value
                           ? 'border-primary bg-primary/[0.04]'
-                          : 'border-line bg-white hover:border-primary/30 hover:bg-bg-soft',
+                          : 'border-line bg-bg-elev hover:border-primary/30 hover:bg-bg-soft',
                       )}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -362,7 +362,7 @@ export function CreateAssessmentDialog({
                             'grid size-5 shrink-0 place-items-center rounded-full border',
                             goal === g.value
                               ? 'border-primary bg-primary text-white'
-                              : 'border-line-2 bg-white',
+                              : 'border-line-2 bg-bg-elev',
                           )}
                         >
                           {goal === g.value && <Check className="size-3" strokeWidth={3} />}
@@ -398,7 +398,7 @@ export function CreateAssessmentDialog({
                     </dd>
                   </div>
                 </dl>
-                <div className="mt-5 flex items-center gap-2 rounded-lg border border-line bg-white px-3 py-2.5 text-xs text-ink-2">
+                <div className="mt-5 flex items-center gap-2 rounded-lg border border-line bg-bg-elev px-3 py-2.5 text-xs text-ink-2">
                   <Clock className="size-4 shrink-0 text-primary" />
                   New accounts include {TRIAL_PERIOD_MONTHS} months of free access.
                 </div>

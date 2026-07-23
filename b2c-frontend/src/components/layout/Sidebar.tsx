@@ -17,7 +17,6 @@ import {
   Shield,
   BarChart3,
   Sparkles,
-  LayoutGrid,
   Crown,
 } from "lucide-react";
 import { cn } from "@/src/lib/utils";
@@ -202,22 +201,13 @@ export function Sidebar() {
       </nav>
 
       {!isCollapsed && (
-        <div className="space-y-4 border-t border-line px-5 py-5">
+        <div className="border-t border-line px-5 py-5">
           <Link
             href="/upgrade"
             className="flex h-11 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-primary-ink shadow-[var(--shadow-primary)] transition hover:bg-primary-dark"
           >
             Purchase now
           </Link>
-
-          <div className="overflow-hidden rounded-xl bg-gradient-to-br from-primary via-primary-2 to-secondary p-4 text-center text-primary-ink shadow-[var(--shadow-glass)]">
-            <span className="mx-auto grid size-10 place-items-center rounded-lg bg-white/15">
-              <LayoutGrid className="size-5" />
-            </span>
-            <p className="mt-3 text-xs leading-5 text-white/90">
-              Build your personalized AI learning path today
-            </p>
-          </div>
         </div>
       )}
 
@@ -245,7 +235,7 @@ export function Sidebar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-40 bg-[rgba(15,23,42,0.45)] backdrop-blur-sm lg:hidden"
             onClick={closeMobile}
           />
         )}

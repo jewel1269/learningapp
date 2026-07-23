@@ -7,6 +7,7 @@ import { AppError } from '../../common/errors/AppError';
 import { getAiClient } from '../ai-guidance/ai.client';
 import { EXERCISE_SYSTEM_PROMPT, buildExercisePrompt } from '../ai-guidance/prompts';
 import { resolveOwnedLesson } from '../lessons/lesson.service';
+import { lessonContentSummary } from '../lessons/lessonContent';
 import { gradingQueue, jobPriority } from '../../jobs/queue';
 
 export const GeneratedExerciseSchema = z
@@ -66,14 +67,6 @@ export type ExerciseGenerator = (input: {
   userId: string;
 }) => Promise<GeneratedExercise>;
 
-function summaryOf(content: unknown, fallback: string): string {
-  if (content && typeof content === 'object' && 'summary' in content) {
-    const s = (content as { summary?: unknown }).summary;
-    if (typeof s === 'string') return s;
-  }
-  return fallback;
-}
-
 const defaultExerciseGenerator: ExerciseGenerator = async ({
   lessonTitle,
   lessonSummary,
@@ -104,7 +97,7 @@ export async function generateExercise(
   const title = lesson.title as string;
   const generated = await generate({
     lessonTitle: title,
-    lessonSummary: summaryOf(lesson.content, title),
+    lessonSummary: lessonContentSummary(lesson.content, title),
     domain,
     userId,
   });

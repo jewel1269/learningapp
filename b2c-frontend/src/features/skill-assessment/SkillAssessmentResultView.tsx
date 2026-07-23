@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Award, BookOpen, CheckCircle2, Route, Sparkles, Target, XCircle } from 'lucide-react';
+import { Award, BookOpen, CheckCircle2, ClipboardList, Route, Target, XCircle } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { Container } from '@/src/components/marketing/Container';
 import { CreateCourseFromRecommendation } from '@/src/features/learning-path/CreateCourseFromRecommendation';
@@ -15,34 +15,49 @@ import type {
   SkillAssessmentSubmission,
   SkillLevel,
 } from '@/src/domain/assessment';
+import { cn } from '@/src/lib/utils';
 
 const LEVEL_COPY: Record<
   SkillLevel,
-  { description: string; badge: string; accent: string; ring: string }
+  {
+    description: string;
+    badge: string;
+    accent: string;
+    headerClass: string;
+    badgeClass: string;
+  }
 > = {
   Beginner: {
-    description: 'Great start — we recommend foundational courses to build your base.',
+    description:
+      'You are building your foundation. We recommend structured introductory courses to strengthen core concepts.',
     badge: 'Foundation track',
-    accent: 'text-[#2563EB]',
-    ring: 'from-[#DBEAFE] to-white border-[#BFDBFE]',
+    accent: 'text-primary',
+    headerClass: 'border-line bg-gradient-to-br from-tint-blue/80 to-bg-elev',
+    badgeClass: 'border-primary/20 bg-primary-soft text-primary',
   },
   Intermediate: {
-    description: 'Solid foundation — you are ready for structured, hands-on learning paths.',
+    description:
+      'You have a solid base and are ready for structured, hands-on learning with practical exercises.',
     badge: 'Growth track',
     accent: 'text-primary',
-    ring: 'from-primary-soft to-white border-primary/20',
+    headerClass: 'border-line bg-gradient-to-br from-primary-soft/70 to-bg-elev',
+    badgeClass: 'border-primary/20 bg-primary-soft text-primary',
   },
   Advanced: {
-    description: 'Strong grasp of the topic — challenge yourself with advanced labs and projects.',
+    description:
+      'You demonstrate strong subject knowledge. Advanced labs and applied projects will help you go further.',
     badge: 'Advanced track',
     accent: 'text-secondary',
-    ring: 'from-[#FFEDD5] to-white border-secondary/25',
+    headerClass: 'border-line bg-gradient-to-br from-secondary-soft/80 to-bg-elev',
+    badgeClass: 'border-secondary/20 bg-secondary-soft text-secondary',
   },
   Expert: {
-    description: 'Outstanding — explore expert tracks and mentor-led live sessions.',
+    description:
+      'Your performance indicates mastery at this level. Explore expert tracks and specialized practice areas.',
     badge: 'Expert track',
     accent: 'text-good',
-    ring: 'from-good-soft to-white border-good/25',
+    headerClass: 'border-line bg-gradient-to-br from-good-soft/80 to-bg-elev',
+    badgeClass: 'border-good/20 bg-good-soft text-good',
   },
 };
 
@@ -68,56 +83,60 @@ export function SkillAssessmentResultView({
   return (
     <div className="pb-16 pt-8 lg:pt-12">
       <Container className="max-w-[1240px]">
-        <div
-          className={`overflow-hidden rounded-3xl border bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)] ${levelInfo.ring}`}
-        >
-          <div className={`border-b bg-gradient-to-br px-6 py-10 text-center sm:px-10 ${levelInfo.ring}`}>
-            <div className="mx-auto grid size-16 place-items-center rounded-3xl bg-white shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
-              <Award className={`size-8 ${levelInfo.accent}`} />
+        <div className="overflow-hidden rounded-2xl border border-line bg-bg-elev shadow-lift">
+          <div className={cn('border-b px-6 py-10 text-center sm:px-10', levelInfo.headerClass)}>
+            <div className="mx-auto grid size-16 place-items-center rounded-2xl border border-line bg-bg-elev shadow-card">
+              <Award className={cn('size-8', levelInfo.accent)} />
             </div>
             <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-ink-3">
-              Your skill level
+              Assessment result
             </p>
-            <h1 className={`mt-2 text-4xl font-bold sm:text-5xl ${levelInfo.accent}`}>
+            <h1 className={cn('mt-2 text-3xl font-bold sm:text-4xl', levelInfo.accent)}>
               {submission.level}
             </h1>
-            <p className="mt-4 text-6xl font-bold tracking-tight text-ink">{submission.score}%</p>
+            <p className="mt-4 text-5xl font-bold tracking-tight text-ink sm:text-6xl">
+              {submission.score}%
+            </p>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm">
-              <span className="rounded-full border border-line bg-white px-3 py-1 font-medium text-ink-2">
+              <span className="rounded-full border border-line bg-bg-soft px-3 py-1 font-medium text-ink-2">
                 {correctCount} of {results.length} correct
               </span>
-              <span className="rounded-full border border-line bg-white px-3 py-1 font-medium text-ink-2">
+              <span className="rounded-full border border-line bg-bg-soft px-3 py-1 font-medium text-ink-2">
                 {topicLabel}
               </span>
-              <span className={`rounded-full border px-3 py-1 font-semibold ${levelInfo.ring} ${levelInfo.accent}`}>
+              <span
+                className={cn(
+                  'rounded-full border px-3 py-1 font-semibold',
+                  levelInfo.badgeClass,
+                )}
+              >
                 {levelInfo.badge}
               </span>
             </div>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-ink-2">{levelInfo.description}</p>
+            <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-ink-2 sm:text-base">
+              {levelInfo.description}
+            </p>
           </div>
         </div>
 
-        <div className="mt-10 overflow-hidden rounded-3xl border border-line/80 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.05)]">
-          <div className="border-b border-line/80 bg-gradient-to-br from-primary-soft/40 to-white px-6 py-8 sm:px-10">
-            <div className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-primary">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-line bg-bg-elev shadow-card">
+          <div className="border-b border-line bg-[linear-gradient(90deg,color-mix(in_srgb,var(--primary)_10%,transparent)_0%,transparent_55%)] px-6 py-8 sm:px-10">
+            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
               <Route className="size-4" />
-              Your learning path
+              Recommended learning path
             </div>
             <h2 className="mt-3 text-2xl font-bold text-ink sm:text-3xl">{recommendedTitle}</h2>
-            <p className="mt-2 max-w-2xl text-sm text-ink-2 sm:text-base">
-              Based on your {submission.score}% score, we recommend this {prefill.courseLevel}-level
-              course in {prefill.category}. Generate it now — tailored modules, labs, and quizzes
-              included.
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-2 sm:text-base">
+              Based on your {submission.score}% score, we recommend a {prefill.courseLevel}-level
+              course in {prefill.category}. Generate a personalized program with modules, labs, and
+              assessments.
             </p>
           </div>
 
           <div className="grid gap-4 p-6 sm:grid-cols-3 sm:p-8">
             {pathSteps.map((step, index) => (
-              <div
-                key={step.title}
-                className="rounded-2xl border border-line/80 bg-[#FCFCFC] p-5"
-              >
-                <span className="grid size-9 place-items-center rounded-xl bg-primary-soft text-sm font-bold text-primary">
+              <div key={step.title} className="rounded-xl border border-line bg-bg-soft p-5">
+                <span className="grid size-9 place-items-center rounded-lg border border-primary/15 bg-primary-soft text-sm font-bold text-primary">
                   {index + 1}
                 </span>
                 <h3 className="mt-4 font-semibold text-ink">{step.title}</h3>
@@ -126,23 +145,21 @@ export function SkillAssessmentResultView({
             ))}
           </div>
 
-          <div className="border-t border-line/80 bg-[#FCFCFC] px-6 py-6 sm:px-8">
+          <div className="border-t border-line bg-bg-soft px-6 py-6 sm:px-8">
             <CreateCourseFromRecommendation prefill={prefill} />
           </div>
         </div>
 
         <div className="mt-10">
-          <div className="mb-6 flex items-end justify-between gap-4">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-primary">
+              <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
                 <Target className="size-4" />
                 Answer review
               </div>
-              <h2 className="mt-2 text-2xl font-bold text-ink">See what you got right</h2>
+              <h2 className="mt-2 text-2xl font-bold text-ink">Question breakdown</h2>
             </div>
-            <p className="hidden text-sm text-ink-3 sm:block">
-              Private results — only visible to your account
-            </p>
+            <p className="text-sm text-ink-3">Private results — visible only to your account</p>
           </div>
 
           <div className="grid gap-5 xl:grid-cols-2">
@@ -152,13 +169,16 @@ export function SkillAssessmentResultView({
               return (
                 <div
                   key={r.questionIndex}
-                  className="rounded-3xl border border-line/80 bg-white p-6 shadow-[0_12px_40px_rgba(15,23,42,0.05)]"
+                  className="rounded-2xl border border-line bg-bg-elev p-6 shadow-card"
                 >
                   <div className="flex items-start gap-4">
                     <span
-                      className={`grid size-11 shrink-0 place-items-center rounded-2xl ${
-                        r.correct ? 'bg-good-soft text-good' : 'bg-bad/10 text-bad'
-                      }`}
+                      className={cn(
+                        'grid size-10 shrink-0 place-items-center rounded-xl border',
+                        r.correct
+                          ? 'border-good/20 bg-good-soft text-good'
+                          : 'border-bad/20 bg-bad-soft text-bad',
+                      )}
                     >
                       {r.correct ? (
                         <CheckCircle2 className="size-5" />
@@ -166,23 +186,24 @@ export function SkillAssessmentResultView({
                         <XCircle className="size-5" />
                       )}
                     </span>
-                    <div className="flex-1">
+                    <div className="min-w-0 flex-1">
                       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-3">
                         Question {r.questionIndex + 1}
                       </p>
                       <p className="mt-2 text-base font-semibold leading-7 text-ink">
                         {q?.question ?? 'Question'}
                       </p>
-                      <div className="mt-4 space-y-2 rounded-2xl bg-[#FCFCFC] p-4">
+                      <div className="mt-4 space-y-2 rounded-xl border border-line bg-bg-soft p-4">
                         <p className="text-sm text-ink-2">
-                          <span className="font-medium text-ink-3">Your answer:</span> {given || '—'}
+                          <span className="font-medium text-ink">Your answer:</span>{' '}
+                          {given || '—'}
                         </p>
-                        {!r.correct && (
+                        {!r.correct ? (
                           <p className="text-sm text-good">
-                            <span className="font-medium text-ink-3">Correct answer:</span>{' '}
+                            <span className="font-medium text-ink">Correct answer:</span>{' '}
                             {r.correctAnswer}
                           </p>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -192,11 +213,11 @@ export function SkillAssessmentResultView({
           </div>
         </div>
 
-        <div className="mt-10 flex flex-wrap gap-3 rounded-3xl border border-line/80 bg-white p-6 shadow-[0_12px_40px_rgba(15,23,42,0.05)]">
+        <div className="mt-10 flex flex-wrap gap-3 rounded-2xl border border-line bg-bg-elev p-6 shadow-card">
           <Link href="/assessments">
-            <Button size="lg" className="bg-primary hover:bg-primary-dark">
-              <Sparkles className="size-4" />
-              Take another assessment
+            <Button size="lg">
+              <ClipboardList className="size-4" />
+              View all assessments
             </Button>
           </Link>
           <Link href="/dashboard">

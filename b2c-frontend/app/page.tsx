@@ -3,10 +3,11 @@ import { Hero } from '@/src/components/marketing/Hero';
 import { Categories } from '@/src/components/marketing/Categories';
 import { Footer } from '@/src/components/marketing/Footer';
 import { LandingAssessmentPrompt } from '@/src/components/marketing/LandingAssessmentPrompt';
+import { MarketingPageShell } from '@/src/components/marketing/MarketingPageShell';
 
 export default function LandingPage() {
   return (
-    <div className="font-sans text-[#0F172A]">
+    <MarketingPageShell>
       <LandingAssessmentPrompt />
       <Navbar />
       <main>
@@ -14,6 +15,6 @@ export default function LandingPage() {
         <Categories />
       </main>
       <Footer />
-    </div>
+    </MarketingPageShell>
   );
 }

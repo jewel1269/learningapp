@@ -33,13 +33,14 @@ function computeCourseStats(courses: Course[]) {
 function DashboardHeader() {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <h1 className="text-2xl font-bold text-[#3D2C1E]">Dashboard</h1>
-      <nav className="flex items-center gap-1.5 text-sm text-[#9CA3AF]">
-        <Link href="/dashboard" className="transition hover:text-[#3D2C1E]">
-          AIStudy
+      <h1 className="text-2xl font-bold text-ink">Dashboard</h1>
+      <nav className="flex items-center gap-1.5 text-sm text-ink-3">
+        <Link href="/dashboard" className="transition hover:text-primary">
+          <span className="text-primary">AI</span>
+          <span className="text-ink">Study</span>
         </Link>
         <ChevronRight className="size-4" />
-        <span className="font-medium text-[#3D2C1E]">Dashboard</span>
+        <span className="font-medium text-ink">Dashboard</span>
       </nav>
     </div>
   );
@@ -93,8 +94,8 @@ export function DashboardPage() {
     return (
       <div className={shellClass}>
         <DashboardHeader />
-        <div className="rounded-xl border border-[#EBEBEB] bg-white p-10 text-center shadow-sm">
-          <p className="text-[#5C534A]">{t('dashboard.loadError')}</p>
+        <div className="rounded-2xl border border-line bg-bg-elev p-10 text-center shadow-soft">
+          <p className="text-ink-2">{t('dashboard.loadError')}</p>
           <Button variant="soft" className="mt-4" onClick={() => coursesQ.refetch()}>
             {t('common.retry')}
           </Button>
@@ -108,16 +109,16 @@ export function DashboardPage() {
       <div className={shellClass}>
         <DashboardHeader />
 
-        <div className="rounded-xl border border-dashed border-[#D1D5DB] bg-white p-12 text-center shadow-sm">
-          <div className="mx-auto grid size-14 place-items-center rounded-full bg-[#E7E3DE] text-[#6D4C41]">
+        <div className="rounded-2xl border border-dashed border-line-2 bg-bg-elev p-12 text-center shadow-soft">
+          <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary-soft text-primary">
             <Sparkles className="size-7" />
           </div>
-          <h2 className="mt-4 text-xl font-bold text-[#3D2C1E]">{t('dashboard.createFirstTitle')}</h2>
-          <p className="mx-auto mt-2 max-w-[42ch] text-sm text-[#9CA3AF]">
+          <h2 className="mt-4 text-xl font-bold text-ink">{t('dashboard.createFirstTitle')}</h2>
+          <p className="mx-auto mt-2 max-w-[42ch] text-sm text-ink-2">
             {t('dashboard.createFirstBody')}
           </p>
           <Link href="/create-course" className="mt-6 inline-block">
-            <Button size="lg" className="rounded-md bg-[#6D4C41] hover:bg-[#5D4037]">
+            <Button size="lg">
               <Plus className="size-4" /> {t('dashboard.startLearning')}
             </Button>
           </Link>
@@ -131,31 +132,29 @@ export function DashboardPage() {
       <DashboardHeader />
 
       {!isPremium && subscription?.requiresPayment ? (
-        <div className="rounded-xl border border-bad/20 bg-white px-5 py-4 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-4">
+        <div className="rounded-2xl border border-bad/20 bg-bg-elev px-5 py-4 shadow-soft sm:flex sm:items-center sm:justify-between sm:gap-4">
           <div>
-            <p className="font-semibold text-[#3D2C1E]">{t('dashboard.trialEndedTitle')}</p>
-            <p className="mt-1 text-sm text-[#9CA3AF]">{t('dashboard.trialEndedBody')}</p>
+            <p className="font-semibold text-ink">{t('dashboard.trialEndedTitle')}</p>
+            <p className="mt-1 text-sm text-ink-2">{t('dashboard.trialEndedBody')}</p>
           </div>
           <Link href="/upgrade" className="mt-3 inline-block sm:mt-0">
-            <Button className="rounded-md bg-[#6D4C41] hover:bg-[#5D4037]">
-              {t('dashboard.subscribeNow')}
-            </Button>
+            <Button>{t('dashboard.subscribeNow')}</Button>
           </Link>
         </div>
       ) : null}
 
       {!isPremium && subscription?.trialActive ? (
-        <div className="flex flex-col gap-3 rounded-xl border border-primary/15 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-2xl border border-primary/15 bg-bg-elev px-5 py-4 shadow-soft sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <Clock className="mt-0.5 size-5 shrink-0 text-primary" />
             <div>
-              <p className="font-semibold text-[#3D2C1E]">
+              <p className="font-semibold text-ink">
                 {t('dashboard.trialDaysLeft', {
                   days: String(subscription.daysRemainingInTrial),
                   months: String(TRIAL_PERIOD_MONTHS),
                 })}
               </p>
-              <p className="mt-1 text-sm text-[#9CA3AF]">{t('dashboard.trialPremiumNote')}</p>
+              <p className="mt-1 text-sm text-ink-2">{t('dashboard.trialPremiumNote')}</p>
             </div>
           </div>
           <Link href="/upgrade">
@@ -169,25 +168,25 @@ export function DashboardPage() {
           label="Courses"
           value={String(courseStats.ready)}
           icon={GraduationCap}
-          iconBg="bg-[#E5E7EB] text-[#6B7280]"
+          iconBg="bg-primary-soft text-primary"
         />
         <StudySummaryCard
           label="Progress"
           value={`${courseStats.avgProgress}%`}
           icon={Target}
-          iconBg="bg-[#FEF3C7] text-[#D97706]"
+          iconBg="bg-secondary-soft text-secondary"
         />
         <StudySummaryCard
           label="Achievements"
           value={`${achievements?.earnedCount ?? 0}`}
           icon={Trophy}
-          iconBg="bg-[#DCFCE7] text-[#16A34A]"
+          iconBg="bg-good-soft text-good"
         />
         <StudySummaryCard
           label="Streak"
           value={String(streak)}
           icon={Flame}
-          iconBg="bg-[#DBEAFE] text-[#2563EB]"
+          iconBg="bg-tint-blue text-primary"
         />
       </div>
 
